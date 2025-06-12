@@ -24,6 +24,8 @@ spring:
       enabled: false
     jdbc:
       initialize-schema: always
+  mvc:
+    static-path-pattern: /**
 
 server:
   port: 8080
