@@ -11,7 +11,7 @@ import jakarta.persistence.OneToOne
 @Entity
 class Product(
     private var name: String,
-    private var description: String?=null,
+    private var description: String? = null,
     private var imageUrl: String,
     @ManyToOne
     private val user: User,
@@ -22,7 +22,7 @@ class Product(
     private val id: Long?,
 ) {
     init {
-        if(!isValidName(name)){
+        if (!isValidName(name)) {
             throw IllegalArgumentException("상품 명은 3자 이상 100자 이하여야 한다")
         }
     }
