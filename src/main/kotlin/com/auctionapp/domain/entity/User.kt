@@ -5,21 +5,45 @@ import java.util.regex.Pattern
 
 @Entity
 class User(
-    private var email: String,
-    private var password: String,
-    private var name: String,
+    email: String,
+    password: String,
+    name: String,
     @Enumerated(EnumType.STRING)
-    private val role: Role,
+    val role: Role,
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
-    private val products: MutableList<Product> = mutableListOf(),
+    val products: MutableList<Product> = mutableListOf(),
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
-    private val auctions: MutableList<Auction> = mutableListOf(),
+    val auctions: MutableList<Auction> = mutableListOf(),
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
-    private val bids:MutableList<Bid> = mutableListOf(),
+    val bids: MutableList<Bid> = mutableListOf(),
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private val id: Long?=null,
+    val id: Long? = null,
 ) {
+    var email: String = email
+        set(value) {
+            if (!isValidEmail(value)) {
+                throw IllegalArgumentException("적절한 이메일 형식이 아닙니다")
+            }
+            field = value
+        }
+
+    var password: String = password
+        set(value) {
+            if (!isValidPassword(value)) {
+                throw IllegalArgumentException("적절한 비밀번호 형식이 아닙니다")
+            }
+            field = value
+        }
+
+    var name: String = name
+        set(value) {
+            if (value.isBlank()) {
+                throw IllegalArgumentException("이름은 비어 있을 수 없습니다")
+            }
+            field = value
+        }
+
     init {
         if (!isValidEmail(email)) {
             throw IllegalArgumentException("적절한 이메일 형식이 아닙니다")
@@ -41,5 +65,21 @@ class User(
     private fun isValidEmail(email: String): Boolean {
         val pattern = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
         return Regex(pattern).matches(email)
+    }
+
+    companion object {
+        fun fixture(
+            email: String = "test@test.com",
+            password: String = "Test12345!",
+            name: String = "test",
+            role: Role = Role.CUSTOMER,
+        ): User {
+            return User(
+                email = email,
+                password = password,
+                name = name,
+                role = role,
+            )
+        }
     }
 }
