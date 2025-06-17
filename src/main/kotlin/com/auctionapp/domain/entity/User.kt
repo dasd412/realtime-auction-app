@@ -1,7 +1,5 @@
-package com.auctionapp.com.auctionapp.domain.entity
+package com.auctionapp.domain.entity
 
-import com.auctionapp.domain.entity.Auction
-import com.auctionapp.domain.entity.Product
 import jakarta.persistence.*
 import java.util.regex.Pattern
 

@@ -1,8 +1,6 @@
 package com.auctionapp.domain.entity
 
 import com.auctionapp.com.auctionapp.domain.entity.AuctionStatus
-import com.auctionapp.com.auctionapp.domain.entity.Bid
-import com.auctionapp.com.auctionapp.domain.entity.User
 import jakarta.persistence.*
 import java.time.LocalDateTime
 
@@ -13,7 +11,7 @@ class Auction(
     private var startTime:LocalDateTime,
     private var endTime:LocalDateTime,
     @Enumerated(EnumType.STRING)
-    private var staus:AuctionStatus,
+    private var status:AuctionStatus,
     @ManyToOne
     private val user: User,
     @OneToOne

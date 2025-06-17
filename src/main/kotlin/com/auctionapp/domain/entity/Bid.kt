@@ -1,4 +1,4 @@
-package com.auctionapp.com.auctionapp.domain.entity
+package com.auctionapp.domain.entity
 
 import com.auctionapp.domain.entity.Auction
 import jakarta.persistence.Entity

@@ -1,6 +1,5 @@
 package com.auctionapp.domain.entity
 
-import com.auctionapp.com.auctionapp.domain.entity.User
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
