@@ -1,17 +1,14 @@
 package com.auctionapp.domain.entity
 
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.ManyToOne
-import jakarta.persistence.OneToOne
+import jakarta.persistence.*
 
 @Entity
 class Product(
     private var name: String,
     private var description: String? = null,
     private var imageUrl: String,
+    @Enumerated(EnumType.STRING)
+    private var status: ProductStatus,
     @ManyToOne
     private val user: User,
     @OneToOne
