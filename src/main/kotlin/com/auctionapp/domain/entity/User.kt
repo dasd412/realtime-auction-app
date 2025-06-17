@@ -1,5 +1,6 @@
 package com.auctionapp.com.auctionapp.domain.entity
 
+import com.auctionapp.domain.entity.Product
 import jakarta.persistence.*
 import java.util.regex.Pattern
 
@@ -10,9 +11,11 @@ class User(
     private var name: String,
     @Enumerated(EnumType.STRING)
     private val role: Role,
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
+    private val products: MutableList<Product> = mutableListOf(),
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private val id: Long?,
+    private val id: Long?=null,
 ) {
     init {
         if (!isValidEmail(email)) {
