@@ -6,15 +6,17 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.ManyToOne
+import jakarta.persistence.OneToOne
 
 @Entity
 class Product(
     private var name: String,
-    private var description: String?,
-    private var initialPrice: Long,
+    private var description: String?=null,
     private var imageUrl: String,
     @ManyToOne
     private val user: User,
+    @OneToOne
+    private val auction: Auction,
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private val id: Long?,
@@ -22,9 +24,6 @@ class Product(
     init {
         if(!isValidName(name)){
             throw IllegalArgumentException("상품 명은 3자 이상 100자 이하여야 한다")
-        }
-        if (initialPrice < 1000) {
-            throw IllegalArgumentException("초기 가격은 1000원 이상이어야 합니다")
         }
     }
 

@@ -1,5 +1,6 @@
 package com.auctionapp.com.auctionapp.domain.entity
 
+import com.auctionapp.domain.entity.Auction
 import com.auctionapp.domain.entity.Product
 import jakarta.persistence.*
 import java.util.regex.Pattern
@@ -13,6 +14,8 @@ class User(
     private val role: Role,
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
     private val products: MutableList<Product> = mutableListOf(),
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
+    private val auctions: MutableList<Auction> = mutableListOf(),
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private val id: Long?=null,
