@@ -11,8 +11,6 @@ class Product(
     private var status: ProductStatus,
     @ManyToOne
     private val user: User,
-    @OneToOne
-    private val auction: Auction,
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private val id: Long?,
