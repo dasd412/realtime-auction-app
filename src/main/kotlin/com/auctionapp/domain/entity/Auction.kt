@@ -47,30 +47,55 @@ import java.time.LocalDateTime
  */
 @Entity
 class Auction(
-    private var initialPrice: Long,
-    private var minimumBidUnit: Long,
-    private var startTime: LocalDateTime,
-    private var endTime: LocalDateTime,
+    val initialPrice: Long,
+    val minimumBidUnit: Long,
+    val startTime: LocalDateTime,
+    val endTime: LocalDateTime,
     @Enumerated(EnumType.STRING)
-    private var status: AuctionStatus,
+    var status: AuctionStatus,
     @ManyToOne
-    private val user: User,
+    val user: User,
     @OneToOne
-    private val product: Product,
+    val product: Product,
     @OneToMany(mappedBy = "auction", cascade = [CascadeType.ALL], orphanRemoval = true)
-    private val bids: MutableList<Bid> = mutableListOf(),
+    val bids: MutableList<Bid> = mutableListOf(),
     @Version
-    private var version: Long = 0, //학습용 낙관적 락
+    var version: Long = 0, //학습용 낙관적 락
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private val id: Long? = null,
+    val id: Long? = null,
 ) {
     init {
         if (initialPrice < 1000) {
             throw IllegalArgumentException("초기 가격은 1000원 이상이어야 합니다")
         }
+        if(minimumBidUnit<0){
+            throw IllegalArgumentException("최소 입찰 단위는 음수가 될 수 없습니다")
+        }
         if (endTime.isBefore(startTime.plusHours(1))) {
             throw IllegalArgumentException("종료 시각은 시작 시간보다 최소 1시간 이후여야 합니다")
+        }
+    }
+
+    companion object {
+        fun fixture(
+            initialPrice: Long = 1000L,
+            minimumBidUnit: Long = 100L,
+            startTime: LocalDateTime = LocalDateTime.now().minusHours(1),
+            endTime: LocalDateTime = LocalDateTime.now(),
+            status: AuctionStatus = AuctionStatus.NOT_STARTED,
+            user: User,
+            product: Product,
+        ): Auction {
+            return Auction(
+                initialPrice = initialPrice,
+                minimumBidUnit = minimumBidUnit,
+                startTime = startTime,
+                endTime = endTime,
+                status = status,
+                user = user,
+                product = product
+            )
         }
     }
 }

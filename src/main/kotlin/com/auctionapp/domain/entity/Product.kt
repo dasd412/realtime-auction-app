@@ -4,16 +4,16 @@ import jakarta.persistence.*
 
 @Entity
 class Product(
-    private var name: String,
-    private var description: String? = null,
-    private var imageUrl: String,
+    var name: String,
+    var description: String? = null,
+    var imageUrl: String,
     @Enumerated(EnumType.STRING)
-    private var status: ProductStatus,
+    var status: ProductStatus,
     @ManyToOne
-    private val user: User,
+    val user: User,
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private val id: Long?,
+    val id: Long? = null,
 ) {
     init {
         if (!isValidName(name)) {
@@ -23,5 +23,23 @@ class Product(
 
     private fun isValidName(name: String): Boolean {
         return name.length in 3..100
+    }
+
+    companion object {
+        fun fixture(
+            name: String = "product",
+            description: String? = "test",
+            imageUrl: String = "test@test.com",
+            status: ProductStatus = ProductStatus.AVAILABLE,
+            user: User,
+        ): Product {
+            return Product(
+                name = name,
+                description = description,
+                imageUrl = imageUrl,
+                status = status,
+                user = user,
+            )
+        }
     }
 }
