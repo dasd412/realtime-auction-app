@@ -1,5 +1,7 @@
 package com.auctionapp.domain.entity
 
+import com.auctionapp.domain.exception.InvalidProductImageUrlException
+import com.auctionapp.domain.exception.InvalidProductNameException
 import jakarta.persistence.*
 
 @Entity
@@ -18,17 +20,17 @@ class Product(
     var imageUrl: String = imageUrl
         set(value) {
             if (!isValidImageUrl(value)) {
-                throw IllegalArgumentException("적절한 image url이 아닙니다")
+                throw InvalidProductImageUrlException()
             }
             field = value
         }
 
     init {
         if (!isValidName(name)) {
-            throw IllegalArgumentException("상품 명은 3자 이상 100자 이하여야 합니다")
+            throw InvalidProductNameException()
         }
         if (!isValidImageUrl(imageUrl)) {
-            throw IllegalArgumentException("적절한 image url이 아닙니다")
+            throw InvalidProductImageUrlException()
         }
     }
 

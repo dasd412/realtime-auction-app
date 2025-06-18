@@ -1,5 +1,7 @@
 package com.auctionapp.domain.entity
 
+import com.auctionapp.domain.exception.InvalidProductImageUrlException
+import com.auctionapp.domain.exception.InvalidProductNameException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -14,10 +16,8 @@ class ProductTest {
         val user = User.fixture()
 
         //when & then
-        assertThrows<IllegalArgumentException> {
+        assertThrows<InvalidProductNameException> {
             Product.fixture(name = name, user = user)
-        }.apply {
-            assertThat(message).isEqualTo("상품 명은 3자 이상 100자 이하여야 합니다")
         }
     }
 
@@ -29,10 +29,8 @@ class ProductTest {
         val user = User.fixture()
 
         //when & then
-        assertThrows<IllegalArgumentException> {
+        assertThrows<InvalidProductNameException> {
             Product.fixture(name = name, user = user)
-        }.apply {
-            assertThat(message).isEqualTo("상품 명은 3자 이상 100자 이하여야 합니다")
         }
     }
 
@@ -56,10 +54,8 @@ class ProductTest {
         val user = User.fixture()
 
         //when & then
-        assertThrows<IllegalArgumentException> {
+        assertThrows<InvalidProductImageUrlException> {
             Product.fixture(imageUrl = imageUrl, user = user)
-        }.apply {
-            assertThat(message).isEqualTo("적절한 image url이 아닙니다")
         }
     }
 
@@ -87,10 +83,8 @@ class ProductTest {
         val product = Product.fixture(name = name, imageUrl = imageUrl, user = user)
 
         //when & then
-        assertThrows<IllegalArgumentException> {
+        assertThrows<InvalidProductImageUrlException> {
             product.imageUrl = "test"
-        }.apply {
-            assertThat(message).isEqualTo("적절한 image url이 아닙니다")
         }
     }
 

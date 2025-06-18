@@ -1,5 +1,8 @@
 package com.auctionapp.domain.entity
 
+import com.auctionapp.domain.exception.InvalidAuctionTimeException
+import com.auctionapp.domain.exception.InvalidInitialPriceException
+import com.auctionapp.domain.exception.InvalidMinimumBidUnitException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -16,10 +19,8 @@ class AuctionTest {
         val product=Product.fixture(user = user)
 
         //when & then
-        assertThrows<IllegalArgumentException> {
+        assertThrows<InvalidInitialPriceException> {
             Auction.fixture(initialPrice = initialPrice, user = user,product=product)
-        }.apply {
-            assertThat(message).isEqualTo("초기 가격은 1000원 이상이어야 합니다")
         }
     }
 
@@ -32,10 +33,8 @@ class AuctionTest {
         val product=Product.fixture(user = user)
 
         //when & then
-        assertThrows<IllegalArgumentException> {
+        assertThrows<InvalidMinimumBidUnitException> {
             Auction.fixture(minimumBidUnit = minimumBidUnit, user = user,product=product)
-        }.apply {
-            assertThat(message).isEqualTo("최소 입찰 단위는 음수가 될 수 없습니다")
         }
     }
 
@@ -49,10 +48,8 @@ class AuctionTest {
         val product=Product.fixture(user = user)
 
         //when & then
-        assertThrows<IllegalArgumentException> {
+        assertThrows<InvalidAuctionTimeException> {
             Auction.fixture(startTime = startTime, endTime = endTime, user = user,product=product)
-        }.apply {
-            assertThat(message).isEqualTo("종료 시각은 시작 시간보다 최소 1시간 이후여야 합니다")
         }
     }
 

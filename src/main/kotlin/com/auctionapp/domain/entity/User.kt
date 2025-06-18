@@ -1,5 +1,8 @@
 package com.auctionapp.domain.entity
 
+import com.auctionapp.com.auctionapp.domain.exception.InvalidEmailException
+import com.auctionapp.com.auctionapp.domain.exception.InvalidPasswordException
+import com.auctionapp.com.auctionapp.domain.exception.InvalidUserNameException
 import jakarta.persistence.*
 import java.util.regex.Pattern
 
@@ -23,7 +26,7 @@ class User(
     var email: String = email
         set(value) {
             if (!isValidEmail(value)) {
-                throw IllegalArgumentException("적절한 이메일 형식이 아닙니다")
+                throw InvalidEmailException()
             }
             field = value
         }
@@ -31,7 +34,7 @@ class User(
     var password: String = password
         set(value) {
             if (!isValidPassword(value)) {
-                throw IllegalArgumentException("적절한 비밀번호 형식이 아닙니다")
+                throw InvalidPasswordException()
             }
             field = value
         }
@@ -39,20 +42,20 @@ class User(
     var name: String = name
         set(value) {
             if (value.isBlank()) {
-                throw IllegalArgumentException("이름은 비어 있을 수 없습니다")
+                throw InvalidUserNameException()
             }
             field = value
         }
 
     init {
         if (!isValidEmail(email)) {
-            throw IllegalArgumentException("적절한 이메일 형식이 아닙니다")
+            throw InvalidEmailException()
         }
         if (!isValidPassword(password)) {
-            throw IllegalArgumentException("적절한 비밀번호 형식이 아닙니다")
+            throw InvalidPasswordException()
         }
         if (name.isBlank()) {
-            throw IllegalArgumentException("이름은 비어 있을 수 없습니다")
+            throw InvalidUserNameException()
         }
     }
 

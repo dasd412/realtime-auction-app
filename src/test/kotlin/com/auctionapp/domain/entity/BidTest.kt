@@ -1,5 +1,6 @@
 package com.auctionapp.domain.entity
 
+import com.auctionapp.domain.exception.InvalidBidAmountException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -18,15 +19,13 @@ class BidTest {
         val auction = Auction.fixture(user = user, product = product)
 
         //when & then
-        assertThrows<IllegalArgumentException> {
+        assertThrows<InvalidBidAmountException> {
             Bid.fixture(
                 amount = amount,
                 user = user,
                 auction = auction,
                 createdAt = LocalDateTime.now()
             )
-        }.apply {
-            assertThat(message).isEqualTo("입찰 금액은 음수가 될 수 없습니다")
         }
     }
 

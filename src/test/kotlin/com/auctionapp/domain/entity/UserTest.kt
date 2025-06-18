@@ -1,6 +1,9 @@
 package com.auctionapp.domain.entity
 
 
+import com.auctionapp.com.auctionapp.domain.exception.InvalidEmailException
+import com.auctionapp.com.auctionapp.domain.exception.InvalidPasswordException
+import com.auctionapp.com.auctionapp.domain.exception.InvalidUserNameException
 import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -14,10 +17,8 @@ class UserTest {
         val invalidEmail = "test"
 
         //when & then
-        assertThrows<IllegalArgumentException> {
+        assertThrows<InvalidEmailException> {
             User.fixture(email = invalidEmail)
-        }.apply {
-            assertThat(message).isEqualTo("적절한 이메일 형식이 아닙니다")
         }
     }
 
@@ -28,10 +29,8 @@ class UserTest {
         val invalidPassword = "Test12!"
 
         //when & then
-        assertThrows<IllegalArgumentException> {
+        assertThrows<InvalidPasswordException> {
             User.fixture(password = invalidPassword)
-        }.apply {
-            assertThat(message).isEqualTo("적절한 비밀번호 형식이 아닙니다")
         }
     }
 
@@ -42,10 +41,8 @@ class UserTest {
         val invalidPassword = "testtesttest"
 
         //when & then
-        assertThrows<IllegalArgumentException> {
+        assertThrows<InvalidPasswordException> {
             User.fixture(password = invalidPassword)
-        }.apply {
-            assertThat(message).isEqualTo("적절한 비밀번호 형식이 아닙니다")
         }
     }
 
@@ -56,10 +53,8 @@ class UserTest {
         val blankName = ""
 
         //when & then
-        assertThrows<IllegalArgumentException> {
+        assertThrows<InvalidUserNameException> {
             User.fixture(name = blankName)
-        }.apply {
-            assertThat(message).isEqualTo("이름은 비어 있을 수 없습니다")
         }
     }
 
@@ -89,10 +84,8 @@ class UserTest {
         val invalidEmail = "invalid-email"
 
         // when & then
-        assertThrows<IllegalArgumentException> {
+        assertThrows<InvalidEmailException> {
             user.email = invalidEmail
-        }.apply {
-            assertThat(message).isEqualTo("적절한 이메일 형식이 아닙니다")
         }
     }
     @Test
@@ -103,10 +96,8 @@ class UserTest {
         val invalidPassword = "weak"
 
         // when & then
-        assertThrows<IllegalArgumentException> {
+        assertThrows<InvalidPasswordException> {
             user.password = invalidPassword
-        }.apply {
-            assertThat(message).isEqualTo("적절한 비밀번호 형식이 아닙니다")
         }
     }
 
@@ -118,10 +109,8 @@ class UserTest {
         val blankName = ""
 
         // when & then
-        assertThrows<IllegalArgumentException> {
+        assertThrows<InvalidUserNameException> {
             user.name = blankName
-        }.apply {
-            assertThat(message).isEqualTo("이름은 비어 있을 수 없습니다")
         }
     }
 

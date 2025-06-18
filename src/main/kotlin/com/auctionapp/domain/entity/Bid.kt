@@ -1,5 +1,6 @@
 package com.auctionapp.domain.entity
 
+import com.auctionapp.domain.exception.InvalidBidAmountException
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
@@ -21,7 +22,7 @@ class Bid(
 ) {
     init {
         if (amount <= 0) {
-            throw IllegalArgumentException("입찰 금액은 음수가 될 수 없습니다")
+            throw InvalidBidAmountException()
         }
     }
 

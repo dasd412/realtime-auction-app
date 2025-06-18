@@ -1,5 +1,8 @@
 package com.auctionapp.domain.entity
 
+import com.auctionapp.domain.exception.InvalidAuctionTimeException
+import com.auctionapp.domain.exception.InvalidInitialPriceException
+import com.auctionapp.domain.exception.InvalidMinimumBidUnitException
 import jakarta.persistence.*
 import java.time.LocalDateTime
 
@@ -67,13 +70,13 @@ class Auction(
 ) {
     init {
         if (initialPrice < 1000) {
-            throw IllegalArgumentException("초기 가격은 1000원 이상이어야 합니다")
+            throw InvalidInitialPriceException()
         }
-        if(minimumBidUnit<0){
-            throw IllegalArgumentException("최소 입찰 단위는 음수가 될 수 없습니다")
+        if (minimumBidUnit < 0) {
+            throw InvalidMinimumBidUnitException()
         }
         if (endTime.isBefore(startTime.plusHours(1))) {
-            throw IllegalArgumentException("종료 시각은 시작 시간보다 최소 1시간 이후여야 합니다")
+            throw InvalidAuctionTimeException()
         }
     }
 
