@@ -10,7 +10,7 @@ import java.time.LocalDateTime
 @Entity
 class Bid(
     val amount: Long,
-    val createdAt: LocalDateTime,
+    val createdAt: LocalDateTime = LocalDateTime.now(),
     @ManyToOne
     val user: User,
     @ManyToOne
@@ -28,7 +28,7 @@ class Bid(
     companion object {
         fun fixture(
             amount: Long = 1000L,
-            createdAt: LocalDateTime = LocalDateTime.now(),
+            createdAt: LocalDateTime,
             user: User,
             auction: Auction,
         ): Bid {

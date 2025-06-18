@@ -17,7 +17,7 @@ class Product(
 ) {
     var imageUrl: String = imageUrl
         set(value) {
-            if (!isValidImageUrl(imageUrl)) {
+            if (!isValidImageUrl(value)) {
                 throw IllegalArgumentException("적절한 image url이 아닙니다")
             }
             field = value
@@ -25,7 +25,7 @@ class Product(
 
     init {
         if (!isValidName(name)) {
-            throw IllegalArgumentException("상품 명은 3자 이상 100자 이하여야 한다")
+            throw IllegalArgumentException("상품 명은 3자 이상 100자 이하여야 합니다")
         }
         if (!isValidImageUrl(imageUrl)) {
             throw IllegalArgumentException("적절한 image url이 아닙니다")
