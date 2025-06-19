@@ -70,6 +70,26 @@ class User(
         return Regex(pattern).matches(email)
     }
 
+    fun registerProduct(product: Product) {
+        this.products.add(product)
+    }
+
+    fun registerAuction(auction: Auction) {
+        this.auctions.add(auction)
+    }
+
+    fun placeBid(bid: Bid) {
+        this.bids.add(bid)
+    }
+
+    fun isOwnerOf(product: Product): Boolean {
+        return this.id == product.user.id
+    }
+
+    fun isOwnerOf(auction: Auction): Boolean {
+        return this.id == auction.user.id
+    }
+
     companion object {
         fun fixture(
             email: String = "test@test.com",

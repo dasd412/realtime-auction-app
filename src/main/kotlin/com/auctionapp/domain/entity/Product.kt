@@ -6,7 +6,7 @@ import jakarta.persistence.*
 
 @Entity
 class Product(
-    var name: String,
+    name: String,
     var description: String? = null,
     imageUrl: String,
     @Enumerated(EnumType.STRING)
@@ -17,6 +17,14 @@ class Product(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 ) {
+    var name: String = name
+        set(value) {
+            if (!isValidName(value)) {
+                throw InvalidProductNameException()
+            }
+            field = value
+        }
+
     var imageUrl: String = imageUrl
         set(value) {
             if (!isValidImageUrl(value)) {
@@ -50,6 +58,14 @@ class Product(
 
     fun markAsAvailable() {
         this.status = ProductStatus.AVAILABLE
+    }
+
+    fun isSold(): Boolean {
+        return status == ProductStatus.SOLD
+    }
+
+    fun isAvailable(): Boolean {
+        return status == ProductStatus.AVAILABLE
     }
 
     fun canUpdateOrDelete(auction: Auction?): Boolean {

@@ -122,11 +122,24 @@ class Auction(
     }
 
     fun isStartTimeReached(currentTime: LocalDateTime): Boolean {
-        return this.startTime.isAfter(currentTime) || this.startTime.isEqual(currentTime)
+        return currentTime.isAfter(startTime) || currentTime.isEqual(startTime)
     }
 
     fun isEndTimeReached(currentTime: LocalDateTime): Boolean {
-        return this.endTime.isAfter(currentTime) || this.endTime.isEqual(currentTime)
+        return currentTime.isAfter(endTime) || currentTime.isEqual(endTime)
+    }
+
+    fun getStatusByCurrentTime(currentTime: LocalDateTime): AuctionStatus {
+        return when {
+            this.status == AuctionStatus.CANCELED -> AuctionStatus.CANCELED
+            currentTime.isBefore(startTime) -> AuctionStatus.NOT_STARTED
+            currentTime.isAfter(endTime) -> AuctionStatus.ENDED
+            else -> AuctionStatus.ACTIVE
+        }
+    }
+
+    fun addBid(bid: Bid) {
+        bids.add(bid)
     }
 
     companion object {
