@@ -10,7 +10,7 @@ class Product(
     var description: String? = null,
     imageUrl: String,
     @Enumerated(EnumType.STRING)
-    var status: ProductStatus,
+    var status: ProductStatus = ProductStatus.AVAILABLE,
     @ManyToOne
     val user: User,
     @Id
