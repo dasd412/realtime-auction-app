@@ -1,14 +1,15 @@
 package com.auctionapp.domain.entity
 
-import com.auctionapp.com.auctionapp.domain.exception.InvalidEmailException
-import com.auctionapp.com.auctionapp.domain.exception.InvalidPasswordException
-import com.auctionapp.com.auctionapp.domain.exception.InvalidUserNameException
+import com.auctionapp.domain.exception.InvalidPasswordException
+import com.auctionapp.domain.exception.InvalidUserNameException
+import com.auctionapp.domain.vo.Email
 import jakarta.persistence.*
 import java.util.regex.Pattern
 
 @Entity
 class User(
-    email: String,
+    @Embedded
+    var email: Email,
     password: String,
     name: String,
     @Enumerated(EnumType.STRING)
@@ -23,14 +24,6 @@ class User(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 ) {
-    var email: String = email
-        set(value) {
-            if (!isValidEmail(value)) {
-                throw InvalidEmailException()
-            }
-            field = value
-        }
-
     var password: String = password
         set(value) {
             if (!isValidPassword(value)) {
@@ -48,9 +41,6 @@ class User(
         }
 
     init {
-        if (!isValidEmail(email)) {
-            throw InvalidEmailException()
-        }
         if (!isValidPassword(password)) {
             throw InvalidPasswordException()
         }
@@ -63,11 +53,6 @@ class User(
         // 숫자, 소문자, 대문자, 특수문자(@#$%^&*()_+=!~) 각각 1개 이상 포함, 8~16자
         val regex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#\\$%^&*()_+=!~]).{8,16}$"
         return Pattern.matches(regex, password)
-    }
-
-    private fun isValidEmail(email: String): Boolean {
-        val pattern = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
-        return Regex(pattern).matches(email)
     }
 
     fun registerProduct(product: Product) {
@@ -92,7 +77,7 @@ class User(
 
     companion object {
         fun fixture(
-            email: String = "test@test.com",
+            email: Email = Email("test@test.com"),
             password: String = "Test12345!",
             name: String = "test",
             role: Role = Role.CUSTOMER,

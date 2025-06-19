@@ -1,6 +1,6 @@
 package com.auctionapp.domain.vo
 
-import com.auctionapp.com.auctionapp.domain.exception.InvalidEmailException
+import com.auctionapp.domain.exception.InvalidEmailException
 import jakarta.persistence.Embeddable
 
 @Embeddable

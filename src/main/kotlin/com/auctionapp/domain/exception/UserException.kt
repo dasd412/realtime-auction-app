@@ -1,4 +1,4 @@
-package com.auctionapp.com.auctionapp.domain.exception
+package com.auctionapp.domain.exception
 
 sealed class UserException(message: String) : RuntimeException(message)
 
