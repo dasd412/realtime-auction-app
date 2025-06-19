@@ -44,6 +44,18 @@ class Product(
                 imageExtensions.any { url.endsWith(it, ignoreCase = true) }
     }
 
+    fun markAsSold() {
+        this.status = ProductStatus.SOLD
+    }
+
+    fun markAsAvailable() {
+        this.status = ProductStatus.AVAILABLE
+    }
+
+    fun canUpdateOrDelete(auction: Auction?): Boolean {
+        return auction == null || auction.status == AuctionStatus.NOT_STARTED
+    }
+
     companion object {
         fun fixture(
             name: String = "product",

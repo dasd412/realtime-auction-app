@@ -1,5 +1,6 @@
 package com.auctionapp.domain.entity
 
+import com.auctionapp.domain.exception.CannotCancelActiveAuctionException
 import com.auctionapp.domain.exception.InvalidAuctionTimeException
 import com.auctionapp.domain.exception.InvalidInitialPriceException
 import com.auctionapp.domain.exception.InvalidMinimumBidUnitException
@@ -78,6 +79,54 @@ class Auction(
         if (endTime.isBefore(startTime.plusHours(1))) {
             throw InvalidAuctionTimeException()
         }
+    }
+
+    fun start() {
+        if (this.status == AuctionStatus.NOT_STARTED) {
+            this.status = AuctionStatus.ACTIVE
+        }
+    }
+
+    fun end() {
+        if (this.status == AuctionStatus.ACTIVE) {
+            this.status = AuctionStatus.ENDED
+            if (getHighestBidder() != null) {
+                product.markAsSold()
+            } else {
+                product.markAsAvailable()
+            }
+        }
+    }
+
+    fun cancel() {
+        if (this.status == AuctionStatus.NOT_STARTED) {
+            this.status = AuctionStatus.CANCELED
+        } else {
+            throw CannotCancelActiveAuctionException()
+        }
+    }
+
+    //최고 입찰가 조회
+    fun getHighestBid(): Bid? {
+        return this.bids.maxByOrNull { it.amount }
+    }
+
+    //최고 입찰자 조회
+    fun getHighestBidder(): User? {
+        return getHighestBid()?.user
+    }
+
+    //입찰 횟수 조회
+    fun getBidCounts(): Int {
+        return bids.size
+    }
+
+    fun isStartTimeReached(currentTime: LocalDateTime): Boolean {
+        return this.startTime.isAfter(currentTime) || this.startTime.isEqual(currentTime)
+    }
+
+    fun isEndTimeReached(currentTime: LocalDateTime): Boolean {
+        return this.endTime.isAfter(currentTime) || this.endTime.isEqual(currentTime)
     }
 
     companion object {
