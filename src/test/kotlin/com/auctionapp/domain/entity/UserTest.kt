@@ -1,9 +1,9 @@
 package com.auctionapp.domain.entity
 
-
-import com.auctionapp.com.auctionapp.domain.exception.InvalidEmailException
-import com.auctionapp.com.auctionapp.domain.exception.InvalidPasswordException
-import com.auctionapp.com.auctionapp.domain.exception.InvalidUserNameException
+import com.auctionapp.domain.exception.InvalidEmailException
+import com.auctionapp.domain.exception.InvalidPasswordException
+import com.auctionapp.domain.exception.InvalidUserNameException
+import com.auctionapp.domain.vo.Email
 import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -13,12 +13,9 @@ class UserTest {
     @Test
     @DisplayName("적절한 이메일 형식이 아니라면 실패한다")
     fun userInvalidEmailTest() {
-        //given
-        val invalidEmail = "test"
-
         //when & then
         assertThrows<InvalidEmailException> {
-            User.fixture(email = invalidEmail)
+            Email("test")
         }
     }
 
@@ -62,7 +59,7 @@ class UserTest {
     @DisplayName("적절한 이메일, 비밀 번호, 이름이 있으면 성공한다")
     fun userTest() {
         //given
-        val validEmail = "test@google.com"
+        val validEmail = Email("test@google.com")
         val validPassword = "Test12345!@"
         val name = "tester"
 
@@ -81,13 +78,13 @@ class UserTest {
     fun changeInvalidEmailAfterCreationTest() {
         // given
         val user = User.fixture()
-        val invalidEmail = "invalid-email"
 
         // when & then
         assertThrows<InvalidEmailException> {
-            user.email = invalidEmail
+            user.email = Email("invalid-email")
         }
     }
+
     @Test
     @DisplayName("객체 생성 후 유효하지 않은 비밀번호로 변경하면 실패한다")
     fun changeInvalidPasswordAfterCreationTest() {
@@ -119,7 +116,7 @@ class UserTest {
     fun changeValidPropertiesAfterCreationTest() {
         // given
         val user = User.fixture()
-        val newEmail = "new@example.com"
+        val newEmail = Email("new@example.com")
         val newPassword = "NewPass123!"
         val newName = "New Name"
 

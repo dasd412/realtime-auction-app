@@ -65,10 +65,10 @@ class ProductTest {
         //given
         val imageUrl = "https://test.com/test.jpg"
         val user = User.fixture()
-        
+
         //when 
         val product = Product.fixture(imageUrl = imageUrl, user = user)
-        
+
         //then
         assertThat(product.imageUrl).isEqualTo(imageUrl)
     }
@@ -98,7 +98,7 @@ class ProductTest {
         val product = Product.fixture(name = name, imageUrl = imageUrl, user = user)
 
         //when
-        product.imageUrl = "https://test.com/test2.jpg" 
+        product.imageUrl = "https://test.com/test2.jpg"
 
         //then
         assertThat(product.imageUrl).isEqualTo("https://test.com/test2.jpg")

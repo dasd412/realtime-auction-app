@@ -82,6 +82,7 @@ class Auction(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 ) {
+    @Transient // 이 필드는 데이터베이스에 저장되지 않음. 도메인 이벤트는 일반적으로 영속성 계층과는 별개로 처리되는 일시적인 객체이기 때문.
     private val domainEvents = mutableListOf<DomainEvent>()
 
     init {

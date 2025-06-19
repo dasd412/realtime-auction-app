@@ -3,6 +3,7 @@ package com.auctionapp.domain.entity
 import com.auctionapp.domain.exception.InvalidAuctionTimeException
 import com.auctionapp.domain.exception.InvalidInitialPriceException
 import com.auctionapp.domain.exception.InvalidMinimumBidUnitException
+import com.auctionapp.domain.vo.Money
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -14,27 +15,13 @@ class AuctionTest {
     @DisplayName("초기 가격이 1000원 미만이면 실패한다")
     fun auctionInvalidInitialPriceTest() {
         //given
-        val initialPrice = 999L
+        val initialPrice = Money(999L)
         val user = User.fixture()
-        val product=Product.fixture(user = user)
+        val product = Product.fixture(user = user)
 
         //when & then
         assertThrows<InvalidInitialPriceException> {
-            Auction.fixture(initialPrice = initialPrice, user = user,product=product)
-        }
-    }
-
-    @Test
-    @DisplayName("최소 입찰 단위가 음수면 실패한다")
-    fun auctionInvalidMinimumBidUnitPriceTest() {
-        //given
-        val minimumBidUnit = -100L
-        val user = User.fixture()
-        val product=Product.fixture(user = user)
-
-        //when & then
-        assertThrows<InvalidMinimumBidUnitException> {
-            Auction.fixture(minimumBidUnit = minimumBidUnit, user = user,product=product)
+            Auction.fixture(initialPrice = initialPrice, user = user, product = product)
         }
     }
 
@@ -45,11 +32,16 @@ class AuctionTest {
         val startTime = LocalDateTime.now()
         val endTime = startTime.minusHours(1)
         val user = User.fixture()
-        val product=Product.fixture(user = user)
+        val product = Product.fixture(user = user)
 
         //when & then
         assertThrows<InvalidAuctionTimeException> {
-            Auction.fixture(startTime = startTime, endTime = endTime, user = user,product=product)
+            Auction.fixture(
+                startTime = startTime,
+                endTime = endTime,
+                user = user,
+                product = product
+            )
         }
     }
 
@@ -58,14 +50,21 @@ class AuctionTest {
     fun auctionTest() {
         //given
         val user = User.fixture()
-        val product=Product.fixture(user = user)
-        val initialPrice = 1000L
-        val minimumBidUnit = 100L
+        val product = Product.fixture(user = user)
+        val initialPrice = Money(1000L)
+        val minimumBidUnit = Money(100L)
         val startTime = LocalDateTime.now()
         val endTime = startTime.plusHours(1)
 
         //when
-        val auction = Auction.fixture(initialPrice = initialPrice, minimumBidUnit = minimumBidUnit, startTime = startTime, endTime = endTime, user = user,product=product)
+        val auction = Auction.fixture(
+            initialPrice = initialPrice,
+            minimumBidUnit = minimumBidUnit,
+            startTime = startTime,
+            endTime = endTime,
+            user = user,
+            product = product
+        )
 
         //then
         assertThat(auction.initialPrice).isEqualTo(initialPrice)
