@@ -8,6 +8,7 @@ import com.auctionapp.domain.exception.CannotCancelActiveAuctionException
 import com.auctionapp.domain.exception.InvalidAuctionTimeException
 import com.auctionapp.domain.exception.InvalidInitialPriceException
 import com.auctionapp.domain.exception.InvalidMinimumBidUnitException
+import com.auctionapp.domain.vo.Money
 import jakarta.persistence.*
 import java.time.LocalDateTime
 
@@ -55,8 +56,16 @@ import java.time.LocalDateTime
  */
 @Entity
 class Auction(
-    val initialPrice: Long,
-    val minimumBidUnit: Long,
+    @Embedded
+    @AttributeOverrides(
+        AttributeOverride(name = "amount", column = Column(name = "initial_price"))
+    )// 같은 타입의 VO(money)가 두 개 이상 사용되므로 @AttributeOverrides를 사용하여 컬럼 이름 충돌 방지
+    val initialPrice: Money,
+    @Embedded
+    @AttributeOverrides(
+        AttributeOverride(name = "amount", column = Column(name = "minimum_bid_unit"))
+    )
+    val minimumBidUnit: Money,
     val startTime: LocalDateTime,
     val endTime: LocalDateTime,
     @Enumerated(EnumType.STRING)
@@ -76,10 +85,10 @@ class Auction(
     private val domainEvents = mutableListOf<DomainEvent>()
 
     init {
-        if (initialPrice < 1000) {
+        if (Money(1000L).isGreaterThan(initialPrice)) {
             throw InvalidInitialPriceException()
         }
-        if (minimumBidUnit < 0) {
+        if (Money(0L).isGreaterThanOrEqual(minimumBidUnit)) {
             throw InvalidMinimumBidUnitException()
         }
         if (endTime.isBefore(startTime.plusHours(1))) {
@@ -163,8 +172,8 @@ class Auction(
 
     companion object {
         fun fixture(
-            initialPrice: Long = 1000L,
-            minimumBidUnit: Long = 100L,
+            initialPrice: Money = Money(1000L),
+            minimumBidUnit: Money = Money(100L),
             startTime: LocalDateTime = LocalDateTime.now().minusHours(1),
             endTime: LocalDateTime = LocalDateTime.now(),
             status: AuctionStatus = AuctionStatus.NOT_STARTED,
