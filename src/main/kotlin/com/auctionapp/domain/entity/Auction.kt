@@ -1,5 +1,9 @@
 package com.auctionapp.domain.entity
 
+import com.auctionapp.domain.event.AuctionEndedEvent
+import com.auctionapp.domain.event.AuctionStartedEvent
+import com.auctionapp.domain.event.BidPlacedEvent
+import com.auctionapp.domain.event.DomainEvent
 import com.auctionapp.domain.exception.CannotCancelActiveAuctionException
 import com.auctionapp.domain.exception.InvalidAuctionTimeException
 import com.auctionapp.domain.exception.InvalidInitialPriceException
@@ -69,6 +73,8 @@ class Auction(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 ) {
+    private val domainEvents = mutableListOf<DomainEvent>()
+
     init {
         if (initialPrice < 1000) {
             throw InvalidInitialPriceException()
@@ -82,33 +88,50 @@ class Auction(
     }
 
     fun start() {
-        if (this.status == AuctionStatus.NOT_STARTED) {
-            this.status = AuctionStatus.ACTIVE
+        if (status == AuctionStatus.NOT_STARTED) {
+            status = AuctionStatus.ACTIVE
+
+            domainEvents.add(AuctionStartedEvent(id!!))
         }
     }
 
     fun end() {
-        if (this.status == AuctionStatus.ACTIVE) {
-            this.status = AuctionStatus.ENDED
+        if (status == AuctionStatus.ACTIVE) {
+            status = AuctionStatus.ENDED
             if (getHighestBidder() != null) {
                 product.markAsSold()
             } else {
                 product.markAsAvailable()
             }
+
+            domainEvents.add(AuctionEndedEvent(id!!, getHighestBidder()?.id))
         }
     }
 
     fun cancel() {
-        if (this.status == AuctionStatus.NOT_STARTED) {
-            this.status = AuctionStatus.CANCELED
+        if (status == AuctionStatus.NOT_STARTED) {
+            status = AuctionStatus.CANCELED
         } else {
             throw CannotCancelActiveAuctionException()
         }
     }
 
+    fun addBid(bid: Bid) {
+        bids.add(bid)
+        domainEvents.add(BidPlacedEvent(id!!, bid.id!!, bid.amount))
+    }
+
+    fun getDomainEvents(): List<DomainEvent> {
+        return domainEvents
+    }
+
+    fun clearDomainEvents() {
+        domainEvents.clear()
+    }
+
     //최고 입찰가 조회
     fun getHighestBid(): Bid? {
-        return this.bids.maxByOrNull { it.amount }
+        return bids.maxByOrNull { it.amount }
     }
 
     //최고 입찰자 조회
@@ -131,15 +154,11 @@ class Auction(
 
     fun getStatusByCurrentTime(currentTime: LocalDateTime): AuctionStatus {
         return when {
-            this.status == AuctionStatus.CANCELED -> AuctionStatus.CANCELED
+            status == AuctionStatus.CANCELED -> AuctionStatus.CANCELED
             currentTime.isBefore(startTime) -> AuctionStatus.NOT_STARTED
             currentTime.isAfter(endTime) -> AuctionStatus.ENDED
             else -> AuctionStatus.ACTIVE
         }
-    }
-
-    fun addBid(bid: Bid) {
-        bids.add(bid)
     }
 
     companion object {
