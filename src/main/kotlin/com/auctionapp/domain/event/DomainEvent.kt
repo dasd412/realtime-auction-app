@@ -3,6 +3,7 @@ package com.auctionapp.domain.event
 import com.auctionapp.domain.vo.Money
 import java.time.LocalDateTime
 
+
 interface DomainEvent {
     val occurredOn: LocalDateTime
 }
