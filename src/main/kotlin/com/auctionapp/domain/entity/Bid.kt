@@ -44,8 +44,8 @@ class Bid(
         return this.amount.isGreaterThan(other.amount)
     }
 
-    fun isPlacedAfter(dateTime: LocalDateTime): Boolean {
-        return this.createdAt.isAfter(dateTime)
+    fun isPlacedAfter(other: Bid): Boolean {
+        return this.createdAt.isAfter(other.createdAt)
     }
 
     companion object {

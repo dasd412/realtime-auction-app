@@ -132,4 +132,28 @@ class ProductTest {
         //then
         assertThat(product.imageUrl).isEqualTo("https://test.com/test2.jpg")
     }
+
+    @Test
+    @DisplayName("경매가 진행중이면 상품 상태를 변경할 수 없다")
+    fun productStatusChangeWithActiveAuctionTest() {
+        //given
+        val user = User.fixture()
+        val product = Product.fixture(status = ProductStatus.AVAILABLE, user = user)
+        val auction = Auction.fixture(product = product, user = user, status = AuctionStatus.ACTIVE)
+
+        //when & then
+        assertThat(product.canUpdateOrDelete(auction)).isFalse()
+    }
+
+    @Test
+    @DisplayName("경매가 진행중이 아니면 상품 상태를 변경할 수 있다")
+    fun productStatusChangeWithNotActiveAuctionTest() {
+        //given
+        val user = User.fixture()
+        val product = Product.fixture(status = ProductStatus.AVAILABLE, user = user)
+        val auction = Auction.fixture(product = product, user = user, status = AuctionStatus.NOT_STARTED)
+
+        //when & then
+        assertThat(product.canUpdateOrDelete(auction)).isTrue()
+    }
 }

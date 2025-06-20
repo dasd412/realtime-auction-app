@@ -308,12 +308,14 @@ class AuctionServiceTest(
             Auction.fixture(product = product, user = user1, status = AuctionStatus.ACTIVE)
 
         //when
-        auctionService.placeBid(Money(1000L), user2, auction)
-        auctionService.placeBid(Money(2000L), user3, auction)
+        val bid1 = auctionService.placeBid(Money(1000L), user2, auction)
+        val bid2 = auctionService.placeBid(Money(2000L), user3, auction)
 
         //then
         assertThat(auction.getHighestBid()?.amount?.amount).isEqualTo(Money(2000L).amount)
         assertThat(auction.getHighestBidder()?.id).isEqualTo(user3.id)
         assertThat(auction.getBidCounts()).isEqualTo(2)
+        assertThat(bid1.isHigherThan(bid2)).isFalse()
+        assertThat(bid2.isHigherThan(bid1)).isTrue()
     }
 }

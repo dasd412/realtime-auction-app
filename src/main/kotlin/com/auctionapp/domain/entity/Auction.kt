@@ -168,15 +168,6 @@ class Auction(
         return currentTime.isAfter(endTime) || currentTime.isEqual(endTime)
     }
 
-    fun getStatusByCurrentTime(currentTime: LocalDateTime): AuctionStatus {
-        return when {
-            status == AuctionStatus.CANCELED -> AuctionStatus.CANCELED
-            currentTime.isBefore(startTime) -> AuctionStatus.NOT_STARTED
-            currentTime.isAfter(endTime) -> AuctionStatus.ENDED
-            else -> AuctionStatus.ACTIVE
-        }
-    }
-
     companion object {
         fun fixture(
             initialPrice: Money = Money(1000L),
