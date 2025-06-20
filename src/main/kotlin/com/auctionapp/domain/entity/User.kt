@@ -81,12 +81,14 @@ class User(
             password: String = "Test12345!",
             name: String = "test",
             role: Role = Role.CUSTOMER,
+            id: Long? = null,
         ): User {
             return User(
                 email = email,
                 password = password,
                 name = name,
                 role = role,
+                id = id,
             )
         }
     }

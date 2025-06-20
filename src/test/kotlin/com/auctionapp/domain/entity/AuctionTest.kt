@@ -26,6 +26,20 @@ class AuctionTest {
     }
 
     @Test
+    @DisplayName("최소 입찰 단위가 0원 미만이면 실패한다")
+    fun auctionInvalidMinimumBidUnitTest() {
+        //given
+        val minimumBidUnit = Money(0L)
+        val user = User.fixture()
+        val product = Product.fixture(user = user)
+
+        //when & then
+        assertThrows<InvalidMinimumBidUnitException> {
+            Auction.fixture(minimumBidUnit = minimumBidUnit, user = user, product = product)
+        }
+    }
+
+    @Test
     @DisplayName("종료 시각이 시작 시간보다 1시간 이후가 아니면 실패한다")
     fun auctionInvalidTimeSequenceTest() {
         //given

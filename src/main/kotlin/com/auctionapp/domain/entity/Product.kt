@@ -79,6 +79,7 @@ class Product(
             imageUrl: String = "https://example.com/image.png",
             status: ProductStatus = ProductStatus.AVAILABLE,
             user: User,
+            id: Long? = null,
         ): Product {
             return Product(
                 name = name,
@@ -86,6 +87,7 @@ class Product(
                 imageUrl = imageUrl,
                 status = status,
                 user = user,
+                id = id,
             )
         }
     }

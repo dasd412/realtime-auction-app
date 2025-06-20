@@ -26,9 +26,15 @@ class Bid(
     fun isValidBid(auction: Auction): Boolean {
         val highestBid = auction.getHighestBid()
 
+        if (auction.status != AuctionStatus.ACTIVE) {//진행중이 아닌 거에는 입찰 불가
+            return false
+        }
+
+        if (user.id == auction.user.id) {// 자신의 경매에는 입찰 불가
+            return false
+        }
+
         return when {
-            auction.status != AuctionStatus.ACTIVE -> false //진행중이 아닌 거에는 입찰 불가
-            user.id == auction.user.id -> false // 자신의 경매에는 입찰 불가
             highestBid == null -> amount.isGreaterThanOrEqual(auction.initialPrice)
             else -> amount.isGreaterThan(highestBid.amount.add(auction.minimumBidUnit))
         }
@@ -62,12 +68,14 @@ class Bid(
             createdAt: LocalDateTime,
             user: User,
             auction: Auction,
+            id: Long? = null,
         ): Bid {
             return Bid(
                 amount = amount,
                 createdAt = createdAt,
                 user = user,
                 auction = auction,
+                id = id,
             )
         }
     }

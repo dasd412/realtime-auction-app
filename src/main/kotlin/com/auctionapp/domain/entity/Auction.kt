@@ -4,10 +4,7 @@ import com.auctionapp.domain.event.AuctionEndedEvent
 import com.auctionapp.domain.event.AuctionStartedEvent
 import com.auctionapp.domain.event.BidPlacedEvent
 import com.auctionapp.domain.event.DomainEvent
-import com.auctionapp.domain.exception.CannotCancelActiveAuctionException
-import com.auctionapp.domain.exception.InvalidAuctionTimeException
-import com.auctionapp.domain.exception.InvalidInitialPriceException
-import com.auctionapp.domain.exception.InvalidMinimumBidUnitException
+import com.auctionapp.domain.exception.*
 import com.auctionapp.domain.vo.Money
 import jakarta.persistence.*
 import java.time.LocalDateTime
@@ -100,8 +97,11 @@ class Auction(
     fun start() {
         if (status == AuctionStatus.NOT_STARTED) {
             status = AuctionStatus.ACTIVE
-
-            domainEvents.add(AuctionStartedEvent(id!!))
+            if (id != null) {
+                domainEvents.add(AuctionStartedEvent(id))
+            }
+        }else{
+            throw InvalidAuctionStatusChangeException()
         }
     }
 
@@ -114,7 +114,11 @@ class Auction(
                 product.markAsAvailable()
             }
 
-            domainEvents.add(AuctionEndedEvent(id!!, getHighestBidder()?.id))
+            if (id != null) {
+                domainEvents.add(AuctionEndedEvent(id, getHighestBidder()?.id))
+            }
+        }else{
+            throw InvalidAuctionStatusChangeException()
         }
     }
 
@@ -128,7 +132,9 @@ class Auction(
 
     fun addBid(bid: Bid) {
         bids.add(bid)
-        domainEvents.add(BidPlacedEvent(id!!, bid.id!!, bid.amount))
+        if (id != null && bid.id != null) {
+            domainEvents.add(BidPlacedEvent(id, bid.id, bid.amount))
+        }
     }
 
     fun getDomainEvents(): List<DomainEvent> {
@@ -180,6 +186,7 @@ class Auction(
             status: AuctionStatus = AuctionStatus.NOT_STARTED,
             user: User,
             product: Product,
+            id: Long? = null,
         ): Auction {
             return Auction(
                 initialPrice = initialPrice,
@@ -188,7 +195,8 @@ class Auction(
                 endTime = endTime,
                 status = status,
                 user = user,
-                product = product
+                product = product,
+                id = id,
             )
         }
     }
