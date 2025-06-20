@@ -47,6 +47,35 @@ class ProductTest {
     }
 
     @Test
+    @DisplayName("부적절한 이름으로 변경하면 실패한다")
+    fun productInvalidNameChangeTest() {
+        //given
+        val name = "a".repeat(50)
+        val user = User.fixture()
+        val product = Product.fixture(name = name, user = user)
+
+        //when & then
+        assertThrows<InvalidProductNameException> {
+            product.name = "a".repeat(101)
+        }
+    }
+
+    @Test
+    @DisplayName("적절한 이름으로 변경하면 성공한다")
+    fun productValidNameChangeTest() {
+        //given
+        val name = "a".repeat(50)
+        val user = User.fixture()
+        val product = Product.fixture(name = name, user = user)
+
+        //when
+        product.name = "b".repeat(50)
+
+        //then
+        assertThat(product.name).isEqualTo("b".repeat(50))
+    }
+
+    @Test
     @DisplayName("부적절한 이미지 url이면 실패한다")
     fun productInvalidImageUrlTest() {
         //given
