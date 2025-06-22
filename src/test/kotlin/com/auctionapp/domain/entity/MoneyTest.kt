@@ -6,7 +6,9 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.springframework.test.context.ActiveProfiles
 
+@ActiveProfiles("test")
 class MoneyTest {
     @Test
     @DisplayName("금액이 음수면 실패한다")

@@ -4,8 +4,10 @@ import com.auctionapp.domain.vo.Money
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDateTime
 
+@ActiveProfiles("test")
 class BidTest {
     @Test
     @DisplayName("정상적인 입찰 금액이면 성공한다")

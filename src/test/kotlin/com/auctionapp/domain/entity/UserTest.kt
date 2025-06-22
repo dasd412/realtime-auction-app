@@ -8,7 +8,9 @@ import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.springframework.test.context.ActiveProfiles
 
+@ActiveProfiles("test")
 class UserTest {
     @Test
     @DisplayName("적절한 이메일 형식이 아니라면 실패한다")

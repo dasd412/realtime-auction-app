@@ -8,8 +8,10 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDateTime
 
+@ActiveProfiles("test")
 class AuctionTest {
     @Test
     @DisplayName("초기 가격이 1000원 미만이면 실패한다")

@@ -6,7 +6,9 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.springframework.test.context.ActiveProfiles
 
+@ActiveProfiles("test")
 class ProductTest {
     @Test
     @DisplayName("상품 몀 길이가 3자 미만이면 실패한다")
