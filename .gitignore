@@ -1,6 +1,5 @@
 .gradle
 build/
-!gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
 
@@ -54,6 +53,8 @@ bin/
 *.zip
 *.tar.gz
 *.rar
+# Gradle wrapper jar 예외 처리 (*.jar 이후에 위치)
+!gradle/wrapper/gradle-wrapper.jar
 hs_err_pid*
 replay_pid*
 
