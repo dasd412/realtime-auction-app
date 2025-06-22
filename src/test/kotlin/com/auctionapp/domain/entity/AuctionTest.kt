@@ -14,12 +14,12 @@ class AuctionTest {
     @Test
     @DisplayName("초기 가격이 1000원 미만이면 실패한다")
     fun auctionInvalidInitialPriceTest() {
-        //given
+        // given
         val initialPrice = Money(999L)
         val user = User.fixture()
         val product = Product.fixture(user = user)
 
-        //when & then
+        // when & then
         assertThrows<InvalidInitialPriceException> {
             Auction.fixture(initialPrice = initialPrice, user = user, product = product)
         }
@@ -28,12 +28,12 @@ class AuctionTest {
     @Test
     @DisplayName("최소 입찰 단위가 0원 미만이면 실패한다")
     fun auctionInvalidMinimumBidUnitTest() {
-        //given
+        // given
         val minimumBidUnit = Money(0L)
         val user = User.fixture()
         val product = Product.fixture(user = user)
 
-        //when & then
+        // when & then
         assertThrows<InvalidMinimumBidUnitException> {
             Auction.fixture(minimumBidUnit = minimumBidUnit, user = user, product = product)
         }
@@ -42,19 +42,19 @@ class AuctionTest {
     @Test
     @DisplayName("종료 시각이 시작 시간보다 1시간 이후가 아니면 실패한다")
     fun auctionInvalidTimeSequenceTest() {
-        //given
+        // given
         val startTime = LocalDateTime.now()
         val endTime = startTime.minusHours(1)
         val user = User.fixture()
         val product = Product.fixture(user = user)
 
-        //when & then
+        // when & then
         assertThrows<InvalidAuctionTimeException> {
             Auction.fixture(
                 startTime = startTime,
                 endTime = endTime,
                 user = user,
-                product = product
+                product = product,
             )
         }
     }
@@ -62,7 +62,7 @@ class AuctionTest {
     @Test
     @DisplayName("적절한 초기 가격, 최소 입찰 단위, 시작 시각, 종료 시각이면 성공한다")
     fun auctionTest() {
-        //given
+        // given
         val user = User.fixture()
         val product = Product.fixture(user = user)
         val initialPrice = Money(1000L)
@@ -70,17 +70,18 @@ class AuctionTest {
         val startTime = LocalDateTime.now()
         val endTime = startTime.plusHours(1)
 
-        //when
-        val auction = Auction.fixture(
-            initialPrice = initialPrice,
-            minimumBidUnit = minimumBidUnit,
-            startTime = startTime,
-            endTime = endTime,
-            user = user,
-            product = product
-        )
+        // when
+        val auction =
+            Auction.fixture(
+                initialPrice = initialPrice,
+                minimumBidUnit = minimumBidUnit,
+                startTime = startTime,
+                endTime = endTime,
+                user = user,
+                product = product,
+            )
 
-        //then
+        // then
         assertThat(auction.initialPrice).isEqualTo(initialPrice)
         assertThat(auction.minimumBidUnit).isEqualTo(minimumBidUnit)
         assertThat(auction.startTime).isEqualTo(startTime)

@@ -11,11 +11,11 @@ class ProductTest {
     @Test
     @DisplayName("상품 몀 길이가 3자 미만이면 실패한다")
     fun productInvalidNameLengthTest1() {
-        //given
+        // given
         val name = "ab"
         val user = User.fixture()
 
-        //when & then
+        // when & then
         assertThrows<InvalidProductNameException> {
             Product.fixture(name = name, user = user)
         }
@@ -24,11 +24,11 @@ class ProductTest {
     @Test
     @DisplayName("상품 몀 길이가 100자 초과면 실패한다")
     fun productInvalidNameLengthTest2() {
-        //given
+        // given
         val name = "a".repeat(101)
         val user = User.fixture()
 
-        //when & then
+        // when & then
         assertThrows<InvalidProductNameException> {
             Product.fixture(name = name, user = user)
         }
@@ -37,11 +37,11 @@ class ProductTest {
     @Test
     @DisplayName("상품 몀 길이가 3자 이상 100자 이하면 성공한다")
     fun productValidNameLengthTest() {
-        //given
+        // given
         val name = "a".repeat(50)
         val user = User.fixture()
 
-        //when & then
+        // when & then
         val product = Product.fixture(name = name, user = user)
         assertThat(product.name).isEqualTo(name)
     }
@@ -49,12 +49,12 @@ class ProductTest {
     @Test
     @DisplayName("부적절한 이름으로 변경하면 실패한다")
     fun productInvalidNameChangeTest() {
-        //given
+        // given
         val name = "a".repeat(50)
         val user = User.fixture()
         val product = Product.fixture(name = name, user = user)
 
-        //when & then
+        // when & then
         assertThrows<InvalidProductNameException> {
             product.name = "a".repeat(101)
         }
@@ -63,26 +63,26 @@ class ProductTest {
     @Test
     @DisplayName("적절한 이름으로 변경하면 성공한다")
     fun productValidNameChangeTest() {
-        //given
+        // given
         val name = "a".repeat(50)
         val user = User.fixture()
         val product = Product.fixture(name = name, user = user)
 
-        //when
+        // when
         product.name = "b".repeat(50)
 
-        //then
+        // then
         assertThat(product.name).isEqualTo("b".repeat(50))
     }
 
     @Test
     @DisplayName("부적절한 이미지 url이면 실패한다")
     fun productInvalidImageUrlTest() {
-        //given
+        // given
         val imageUrl = "test"
         val user = User.fixture()
 
-        //when & then
+        // when & then
         assertThrows<InvalidProductImageUrlException> {
             Product.fixture(imageUrl = imageUrl, user = user)
         }
@@ -91,27 +91,27 @@ class ProductTest {
     @Test
     @DisplayName("적절한 이미지 url이면 성공한다")
     fun productValidImageUrlTest() {
-        //given
+        // given
         val imageUrl = "https://test.com/test.jpg"
         val user = User.fixture()
 
-        //when 
+        // when
         val product = Product.fixture(imageUrl = imageUrl, user = user)
 
-        //then
+        // then
         assertThat(product.imageUrl).isEqualTo(imageUrl)
     }
 
     @Test
     @DisplayName("부적절한 image url로 변경하면 실패한다")
     fun productInvalidImageUrlChangeTest() {
-        //given
+        // given
         val name = "a".repeat(50)
         val imageUrl = "https://test.com/test.jpg"
         val user = User.fixture()
         val product = Product.fixture(name = name, imageUrl = imageUrl, user = user)
 
-        //when & then
+        // when & then
         assertThrows<InvalidProductImageUrlException> {
             product.imageUrl = "test"
         }
@@ -120,40 +120,40 @@ class ProductTest {
     @Test
     @DisplayName("적절한 image url로 변경하면 성공한다")
     fun productValidImageUrlChangeTest() {
-        //given
+        // given
         val name = "a".repeat(50)
         val imageUrl = "https://test.com/test.jpg"
         val user = User.fixture()
         val product = Product.fixture(name = name, imageUrl = imageUrl, user = user)
 
-        //when
+        // when
         product.imageUrl = "https://test.com/test2.jpg"
 
-        //then
+        // then
         assertThat(product.imageUrl).isEqualTo("https://test.com/test2.jpg")
     }
 
     @Test
     @DisplayName("경매가 진행중이면 상품 상태를 변경할 수 없다")
     fun productStatusChangeWithActiveAuctionTest() {
-        //given
+        // given
         val user = User.fixture()
         val product = Product.fixture(status = ProductStatus.AVAILABLE, user = user)
         val auction = Auction.fixture(product = product, user = user, status = AuctionStatus.ACTIVE)
 
-        //when & then
+        // when & then
         assertThat(product.canUpdateOrDelete(auction)).isFalse()
     }
 
     @Test
     @DisplayName("경매가 진행중이 아니면 상품 상태를 변경할 수 있다")
     fun productStatusChangeWithNotActiveAuctionTest() {
-        //given
+        // given
         val user = User.fixture()
         val product = Product.fixture(status = ProductStatus.AVAILABLE, user = user)
         val auction = Auction.fixture(product = product, user = user, status = AuctionStatus.NOT_STARTED)
 
-        //when & then
+        // when & then
         assertThat(product.canUpdateOrDelete(auction)).isTrue()
     }
 }

@@ -27,7 +27,7 @@ class MoneyTest {
 
     @Test
     @DisplayName("금액 빼기")
-    fun subtractTest() {    
+    fun subtractTest() {
         val money1 = Money(2000L)
         val money2 = Money(1000L)
         val result = money1.subtract(money2)

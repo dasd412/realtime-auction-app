@@ -5,7 +5,7 @@ import com.auctionapp.domain.event.AuctionStartedEvent
 import com.auctionapp.domain.event.BidPlacedEvent
 import com.auctionapp.domain.event.DomainEvent
 
-//todo 이벤트 핸들링에 대한 구체적인 구현은 웹 소켓 또는 스케쥴러 구현할 때 채운다.
+// todo 이벤트 핸들링에 대한 구체적인 구현은 웹 소켓 또는 스케쥴러 구현할 때 채운다.
 interface DomainEventHandler<T : DomainEvent> {
     fun handle(event: T)
 }

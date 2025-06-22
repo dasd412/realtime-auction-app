@@ -2,7 +2,13 @@ package com.auctionapp.domain.entity
 
 import com.auctionapp.domain.exception.InvalidProductImageUrlException
 import com.auctionapp.domain.exception.InvalidProductNameException
-import jakarta.persistence.*
+import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.ManyToOne
 
 @Entity
 class Product(
@@ -49,7 +55,7 @@ class Product(
     private fun isValidImageUrl(url: String): Boolean {
         val imageExtensions = listOf(".png", ".jpg", ".jpeg", ".gif", ".webp")
         return url.startsWith("http://") || url.startsWith("https://") &&
-                imageExtensions.any { url.endsWith(it, ignoreCase = true) }
+            imageExtensions.any { url.endsWith(it, ignoreCase = true) }
     }
 
     fun markAsSold() {

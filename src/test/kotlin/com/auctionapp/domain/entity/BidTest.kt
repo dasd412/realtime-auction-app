@@ -10,21 +10,22 @@ class BidTest {
     @Test
     @DisplayName("정상적인 입찰 금액이면 성공한다")
     fun bidTest() {
-        //given
+        // given
         val amount = Money(1000L)
         val user = User.fixture()
         val product = Product.fixture(user = user)
         val auction = Auction.fixture(user = user, product = product)
 
-        //when 
-        val bid = Bid.fixture(
-            amount = amount,
-            user = user,
-            auction = auction,
-            createdAt = LocalDateTime.now()
-        )
+        // when
+        val bid =
+            Bid.fixture(
+                amount = amount,
+                user = user,
+                auction = auction,
+                createdAt = LocalDateTime.now(),
+            )
 
-        //then
+        // then
         assertThat(bid.amount).isEqualTo(amount)
     }
 }

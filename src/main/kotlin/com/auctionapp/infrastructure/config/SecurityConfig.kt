@@ -9,7 +9,6 @@ import org.springframework.security.web.SecurityFilterChain
 @Configuration
 @EnableWebSecurity
 class SecurityConfig {
-
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http
@@ -21,7 +20,7 @@ class SecurityConfig {
                     .anyRequest().authenticated()
             }
             .formLogin { it.disable() } // 폼 로그인 비활성화
-            .httpBasic { it.disable() } //http basic 인증 비활성화
+            .httpBasic { it.disable() } // http basic 인증 비활성화
 
         http.headers { it.frameOptions { it.disable() } }
 

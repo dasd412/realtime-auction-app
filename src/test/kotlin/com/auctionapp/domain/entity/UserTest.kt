@@ -13,7 +13,7 @@ class UserTest {
     @Test
     @DisplayName("적절한 이메일 형식이 아니라면 실패한다")
     fun userInvalidEmailTest() {
-        //when & then
+        // when & then
         assertThrows<InvalidEmailException> {
             Email("test")
         }
@@ -22,10 +22,10 @@ class UserTest {
     @Test
     @DisplayName("적절한 비밀 번호 형식이 아니라면 실패한다(길이)")
     fun userInvalidPasswordTest1() {
-        //given
+        // given
         val invalidPassword = "Test12!"
 
-        //when & then
+        // when & then
         assertThrows<InvalidPasswordException> {
             User.fixture(password = invalidPassword)
         }
@@ -34,10 +34,10 @@ class UserTest {
     @Test
     @DisplayName("적절한 비밀 번호 형식이 아니라면 실패한다(문자 종류)")
     fun userInvalidPasswordTest2() {
-        //given
+        // given
         val invalidPassword = "testtesttest"
 
-        //when & then
+        // when & then
         assertThrows<InvalidPasswordException> {
             User.fixture(password = invalidPassword)
         }
@@ -46,10 +46,10 @@ class UserTest {
     @Test
     @DisplayName("이름이 비어있으면 실패한다")
     fun userBlankNameTest() {
-        //given
+        // given
         val blankName = ""
 
-        //when & then
+        // when & then
         assertThrows<InvalidUserNameException> {
             User.fixture(name = blankName)
         }
@@ -58,16 +58,16 @@ class UserTest {
     @Test
     @DisplayName("적절한 이메일, 비밀 번호, 이름이 있으면 성공한다")
     fun userTest() {
-        //given
+        // given
         val validEmail = Email("test@google.com")
         val validPassword = "Test12345!@"
         val name = "tester"
 
-        //when
+        // when
         val user =
             User(email = validEmail, password = validPassword, name = name, role = Role.CUSTOMER)
 
-        //then
+        // then
         assertThat(user.email).isEqualTo(validEmail)
         assertThat(user.password).isEqualTo(validPassword)
         assertThat(user.name).isEqualTo(name)

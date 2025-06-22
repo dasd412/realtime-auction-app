@@ -13,37 +13,54 @@ import java.time.LocalDateTime
 
 @Service
 class AuctionService {
-    fun registerAuction(auction: Auction,user:User,product: Product){
-        if(!user.isOwnerOf(product)){
+    fun registerAuction(
+        auction: Auction,
+        user: User,
+        product: Product,
+    ) {
+        if (!user.isOwnerOf(product)) {
             throw UnAuthorizedProductException()
         }
-        if (product.isSold()){
+        if (product.isSold()) {
             throw AlreadySoldProductException()
         }
 
         user.registerAuction(auction)
     }
 
-    fun startAuction(auction: Auction, currentTime: LocalDateTime) {
+    fun startAuction(
+        auction: Auction,
+        currentTime: LocalDateTime,
+    ) {
         if (auction.isStartTimeReached(currentTime)) {
             auction.start()
         }
     }
 
-    fun endAuction(auction: Auction, currentTime: LocalDateTime) {
+    fun endAuction(
+        auction: Auction,
+        currentTime: LocalDateTime,
+    ) {
         if (auction.isEndTimeReached(currentTime)) {
             auction.end()
         }
     }
 
-    fun cancelAuction(auction: Auction,user: User){
-        if(!user.isOwnerOf(auction)){
+    fun cancelAuction(
+        auction: Auction,
+        user: User,
+    ) {
+        if (!user.isOwnerOf(auction)) {
             throw UnAuthorizedCancelAuctionException()
         }
         auction.cancel()
     }
 
-    fun placeBid(amount: Money, user: User, auction: Auction): Bid {
+    fun placeBid(
+        amount: Money,
+        user: User,
+        auction: Auction,
+    ): Bid {
         val bid = Bid.create(amount, user, auction)
         user.placeBid(bid)
         auction.addBid(bid)

@@ -18,24 +18,24 @@ import java.time.LocalDateTime
     [낙관적 락(Optimistic Lock)과 비관적 락(Pessimistic Lock) 비교]
 
     1. 낙관적 락(Optimistic Lock)
-        * [장점]
-        * 높은 동시성 지원
-        * 데드락 발생 가능성이 낮음
-        * 읽기 작업에 락을 걸지 않아 성능이 좋음
-        * [단점]
-        * 충돌 발생 시 재시도 로직이 필요함
-        * 높은 경쟁 상황에서는 많은 트랜잭션이 실패할 수 있음
-        * 사용자 경험 저하 가능성
+        - [장점]
+        - 높은 동시성 지원
+        - 데드락 발생 가능성이 낮음
+        - 읽기 작업에 락을 걸지 않아 성능이 좋음
+        - [단점]
+        - 충돌 발생 시 재시도 로직이 필요함
+        - 높은 경쟁 상황에서는 많은 트랜잭션이 실패할 수 있음
+        - 사용자 경험 저하 가능성
 
     2. 비관적 락(Pessimistic Lock)
-        * [장점]
-        * 데이터 일관성 보장이 강함
-        * 충돌 상황에서 더 안정적
-        * 재시도 로직이 필요 없음
-        * [단점]
-        * 동시성 저하
-        * 데드락 발생 가능성
-        * 성능 오버헤드
+        - [장점]
+        - 데이터 일관성 보장이 강함
+        - 충돌 상황에서 더 안정적
+        - 재시도 로직이 필요 없음
+        - [단점]
+        - 동시성 저하
+        - 데드락 발생 가능성
+        - 성능 오버헤드
 
 [경매 시스템에 적합한 전략]
     경매 시스템의 경우, 특히 인기 있는 상품에 대한 경매에서는 비관적 락(Pessimistic Lock)이 더 적합할 수 있습니다.
@@ -51,16 +51,18 @@ import java.time.LocalDateTime
 특히 경매 시스템에서는 낙관적 락의 경우 입찰 충돌 시 사용자에게 "다른 사용자가 더 높은 금액으로 입찰했습니다. 다시 시도해주세요."와 같은 메시지를 보여줄 수 있고,
 비관적 락의 경우 입찰 처리 중 다른 입찰을 대기시켜 순차적으로 처리할 수 있습니다.
  */
+
+// 같은 타입의 VO(money)가 두 개 이상 사용되므로 @AttributeOverrides를 사용하여 컬럼 이름 충돌 방지
 @Entity
 class Auction(
     @Embedded
     @AttributeOverrides(
-        AttributeOverride(name = "amount", column = Column(name = "initial_price"))
-    )// 같은 타입의 VO(money)가 두 개 이상 사용되므로 @AttributeOverrides를 사용하여 컬럼 이름 충돌 방지
+        AttributeOverride(name = "amount", column = Column(name = "initial_price")),
+    )
     val initialPrice: Money,
     @Embedded
     @AttributeOverrides(
-        AttributeOverride(name = "amount", column = Column(name = "minimum_bid_unit"))
+        AttributeOverride(name = "amount", column = Column(name = "minimum_bid_unit")),
     )
     val minimumBidUnit: Money,
     val startTime: LocalDateTime,
@@ -74,7 +76,7 @@ class Auction(
     @OneToMany(mappedBy = "auction", cascade = [CascadeType.ALL], orphanRemoval = true)
     val bids: MutableList<Bid> = mutableListOf(),
     @Version
-    var version: Long = 0, //학습용 낙관적 락
+    var version: Long = 0,
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
@@ -100,7 +102,7 @@ class Auction(
             if (id != null) {
                 domainEvents.add(AuctionStartedEvent(id))
             }
-        }else{
+        } else {
             throw InvalidAuctionStatusChangeException()
         }
     }
@@ -117,7 +119,7 @@ class Auction(
             if (id != null) {
                 domainEvents.add(AuctionEndedEvent(id, getHighestBidder()?.id))
             }
-        }else{
+        } else {
             throw InvalidAuctionStatusChangeException()
         }
     }
@@ -145,17 +147,17 @@ class Auction(
         domainEvents.clear()
     }
 
-    //최고 입찰가 조회
+    // 최고 입찰가 조회
     fun getHighestBid(): Bid? {
         return bids.maxByOrNull { it.amount }
     }
 
-    //최고 입찰자 조회
+    // 최고 입찰자 조회
     fun getHighestBidder(): User? {
         return getHighestBid()?.user
     }
 
-    //입찰 횟수 조회
+    // 입찰 횟수 조회
     fun getBidCounts(): Int {
         return bids.size
     }

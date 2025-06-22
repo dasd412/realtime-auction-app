@@ -26,11 +26,11 @@ class Bid(
     fun isValidBid(auction: Auction): Boolean {
         val highestBid = auction.getHighestBid()
 
-        if (auction.status != AuctionStatus.ACTIVE) {//진행중이 아닌 거에는 입찰 불가
+        if (auction.status != AuctionStatus.ACTIVE) { // 진행중이 아닌 거에는 입찰 불가
             return false
         }
 
-        if (user.id == auction.user.id) {// 자신의 경매에는 입찰 불가
+        if (user.id == auction.user.id) { // 자신의 경매에는 입찰 불가
             return false
         }
 
@@ -53,7 +53,11 @@ class Bid(
             입찰 생성 팩토리 메서드
             isValidBid() 검증을 생성자에 넣으면 Auction 객체에 의존하게 되어 순환 참조 문제가 발생할 수 있습니다.
          */
-        fun create(amount: Money, user: User, auction: Auction): Bid {
+        fun create(
+            amount: Money,
+            user: User,
+            auction: Auction,
+        ): Bid {
             val bid = Bid(amount, LocalDateTime.now(), user, auction)
 
             if (!bid.isValidBid(auction)) {
