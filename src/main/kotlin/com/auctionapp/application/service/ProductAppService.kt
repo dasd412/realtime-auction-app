@@ -1,7 +1,7 @@
 package com.auctionapp.com.auctionapp.application.service
 
-import com.auctionapp.com.auctionapp.infrastructure.persistence.ProductRepository
 import com.auctionapp.domain.service.ProductService
+import com.auctionapp.infrastructure.persistence.ProductRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

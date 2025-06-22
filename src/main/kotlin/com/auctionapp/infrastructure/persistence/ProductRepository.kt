@@ -1,4 +1,4 @@
-package com.auctionapp.com.auctionapp.infrastructure.persistence
+package com.auctionapp.infrastructure.persistence
 
 import com.auctionapp.domain.entity.Product
 import org.springframework.data.jpa.repository.JpaRepository

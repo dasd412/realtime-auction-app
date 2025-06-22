@@ -1,12 +1,13 @@
 package com.auctionapp.com.auctionapp.application.service
 
-import com.auctionapp.com.auctionapp.infrastructure.persistence.AuctionRepository
-import com.auctionapp.com.auctionapp.infrastructure.persistence.BidRepository
-import com.auctionapp.com.auctionapp.infrastructure.persistence.ProductRepository
-import com.auctionapp.com.auctionapp.infrastructure.persistence.UserRepository
+
 import com.auctionapp.domain.entity.Auction
 import com.auctionapp.domain.entity.Bid
 import com.auctionapp.domain.service.AuctionService
+import com.auctionapp.infrastructure.persistence.AuctionRepository
+import com.auctionapp.infrastructure.persistence.BidRepository
+import com.auctionapp.infrastructure.persistence.ProductRepository
+import com.auctionapp.infrastructure.persistence.UserRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
