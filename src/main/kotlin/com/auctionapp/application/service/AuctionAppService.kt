@@ -47,6 +47,7 @@ class AuctionAppService(
     ) {
     }
 
+    //todo 동시성 제어와 도메인 이벤트 발행
     @Transactional
     fun placeBid(
         userId: Long,
