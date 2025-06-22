@@ -60,6 +60,15 @@ jobs:
       - name: Code coverage analysis
         run: ./gradlew jacocoTestReport
 
+      - name: Publish Test Results
+        uses: dorny/test-reporter@v1
+        if: always()  # 테스트가 실패해도 결과를 보여줌
+        with:
+          name: 'Test Results'
+          path: 'build/test-results/test/*.xml'
+          reporter: java-junit
+          fail-on-error: false
+          
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
