@@ -6,6 +6,7 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint") version "12.1.0"
     id("io.spring.dependency-management") version "1.1.4"
     id("nu.studer.jooq") version "8.2"
+    id("jacoco")
     kotlin("jvm") version "1.9.23"
     kotlin("plugin.spring") version "1.9.23"
     kotlin("plugin.jpa") version "1.9.23"
@@ -108,6 +109,10 @@ jooq {
     }
 }
 
+jacoco {
+    toolVersion = "0.8.10" // 최신 버전 사용
+}
+
 ktlint {
     verbose.set(true)
     outputToConsole.set(true)
@@ -121,6 +126,29 @@ ktlint {
             "no-wildcard-imports",
         ),
     )
+}
+
+tasks.jacocoTestReport {
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+    dependsOn(tasks.test) // 테스트 실행 후 보고서 생성
+}
+
+tasks.jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = "0.7".toBigDecimal() // 전체 프로젝트 70% 최소 커버리지 요구
+            }
+        }
+    }
+}
+
+// 테스트와 커버리지 검증을 함께 실행하는 태스크
+tasks.register("testWithCoverage") {
+    dependsOn(tasks.test, tasks.jacocoTestReport, tasks.jacocoTestCoverageVerification)
 }
 
 tasks.withType<KotlinCompile> {

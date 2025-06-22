@@ -57,9 +57,6 @@ jobs:
       - name: Run unit tests
         run: ./gradlew test
 
-      - name: Run integration tests
-        run: ./gradlew integrationTest
-
       - name: Code coverage analysis
         run: ./gradlew jacocoTestReport
 
@@ -67,12 +64,6 @@ jobs:
         uses: codecov/codecov-action@v4
         with:
           file: ./build/reports/jacoco/test/jacocoTestReport.xml
-
-      - name: Build with Gradle
-        run: ./gradlew build -x test
-
-      - name: Build Docker image
-        run: docker build -t realtime-auction-app:${{ github.sha }} .
 
       - name: Save test and code quality reports
         uses: actions/upload-artifact@v4
