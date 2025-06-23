@@ -9,6 +9,8 @@ import com.auctionapp.domain.service.ProductService
 import com.auctionapp.infrastructure.persistence.AuctionRepository
 import com.auctionapp.infrastructure.persistence.ProductRepository
 import com.auctionapp.infrastructure.persistence.UserRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -37,8 +39,20 @@ class ProductAppService(
     }
 
     @Transactional(readOnly = true)
-    fun getProductList(): List<Product> {
-        return mutableListOf()
+    fun getProductList(
+        name: String? = null,
+        pageable: Pageable,
+    ): Page<Product> {
+        return if (name.isNullOrBlank()) {
+            productRepository.findAllByOrderByIdDesc(pageable)
+        } else {
+            productRepository.findByNameContainingOrderByIdDesc(name, pageable)
+        }
+    }
+
+    @Transactional(readOnly = true)
+    fun getProductListByUserId(userId: Long): List<Product> {
+        return productRepository.findByUserId(userId)
     }
 
     @Transactional(readOnly = true)
