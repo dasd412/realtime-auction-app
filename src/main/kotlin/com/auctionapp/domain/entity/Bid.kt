@@ -2,12 +2,7 @@ package com.auctionapp.domain.entity
 
 import com.auctionapp.domain.exception.InvalidBidException
 import com.auctionapp.domain.vo.Money
-import jakarta.persistence.Embedded
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.ManyToOne
+import jakarta.persistence.*
 import java.time.LocalDateTime
 
 @Entity

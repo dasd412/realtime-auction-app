@@ -42,7 +42,6 @@ logging:
     root: INFO
     com.auctionapp: DEBUG
     org.springframework.web: INFO
-    org.hibernate.SQL: DEBUG
     org.jooq: DEBUG
 
 auction:
@@ -53,4 +52,4 @@ auction:
   websocket:
     endpoint: /ws
     destination-prefix: /topic
-    application-prefix: /app 
+    application-prefix: /app

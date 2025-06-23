@@ -68,7 +68,7 @@ class Auction(
     val startTime: LocalDateTime,
     val endTime: LocalDateTime,
     @Enumerated(EnumType.STRING)
-    var status: AuctionStatus,
+    var status: AuctionStatus = AuctionStatus.NOT_STARTED,
     @ManyToOne
     val user: User,
     @OneToOne
