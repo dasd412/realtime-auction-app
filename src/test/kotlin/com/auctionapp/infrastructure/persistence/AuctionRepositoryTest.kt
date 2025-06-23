@@ -37,6 +37,7 @@ constructor(
     private lateinit var product2: Product
     private lateinit var activeAuction: Auction
     private lateinit var notStartedAuction: Auction
+
     @Autowired
     private lateinit var entityManager: EntityManager
 
@@ -200,6 +201,81 @@ constructor(
         assertThat(page.totalElements).isEqualTo(1)
         assertThat(page.content[0].id).isEqualTo(activeAuction.id)
         assertThat(page.content[0].bids.size).isEqualTo(3)
+    }
+
+
+    @Test
+    @DisplayName("N+1 문제 확인 - 경매 목록 조회 후 입찰 컬렉션 접근 시 추가 쿼리 발생")
+    fun nPlusOneProblemDemonstrationTest() {
+        // 테스트를 위한 추가 데이터 생성
+        val now = LocalDateTime.now()
+
+        // 추가 경매 생성 (3개 더 생성)
+        val additionalProducts = mutableListOf<Product>()
+        val additionalAuctions = mutableListOf<Auction>()
+
+        for (i in 1..3) {
+            val product = Product(
+                "추가상품$i",
+                "설명$i",
+                "https://example.com/image$i.jpg",
+                ProductStatus.AVAILABLE,
+                seller
+            )
+            additionalProducts.add(product)
+
+            val auction = Auction(
+                initialPrice = Money(1000L * i),
+                minimumBidUnit = Money(100L),
+                startTime = now.minusHours(1),
+                endTime = now.plusHours(1),
+                status = AuctionStatus.ACTIVE,
+                user = seller,
+                product = product
+            )
+            additionalAuctions.add(auction)
+        }
+
+        productRepository.saveAll(additionalProducts)
+        auctionRepository.saveAll(additionalAuctions)
+
+        // 각 경매에 입찰 추가 (각 경매당 2개씩)
+        val additionalBids = mutableListOf<Bid>()
+
+        for (auction in additionalAuctions) {
+            val bid1 = Bid(Money(auction.initialPrice.amount + 500), now.minusMinutes(20), bidder1, auction)
+            val bid2 = Bid(Money(auction.initialPrice.amount + 1000), now.minusMinutes(10), bidder2, auction)
+            additionalBids.add(bid1)
+            additionalBids.add(bid2)
+            auction.bids.add(bid1)
+            auction.bids.add(bid2)
+        }
+
+        bidRepository.saveAll(additionalBids)
+        auctionRepository.saveAll(additionalAuctions)
+
+        // when: 판매자의 모든 경매 조회
+        entityManager.flush()
+        entityManager.clear()
+        val auctions = auctionRepository.findByUser(seller, PageRequest.of(0, 10))
+
+        // then: 각 경매의 입찰 목록에 접근하면 추가 쿼리 발생
+        for (auction in auctions) {
+            // 이 시점에 Hibernate.isInitialized 확인
+            assertFalse(
+                Hibernate.isInitialized(auction.bids),
+                "경매 ${auction.id}의 입찰 목록은 접근 전에 초기화되지 않아야 함"
+            )
+
+            // 입찰 목록에 접근 - 이 시점에 추가 쿼리 발생
+            println("경매 ID: ${auction.id}, 입찰 수: ${auction.bids.size}")
+
+            // 접근 후 초기화 확인
+            assertTrue(
+                Hibernate.isInitialized(auction.bids),
+                "경매 ${auction.id}의 입찰 목록은 접근 후 초기화되어야 함"
+            )
+        }
     }
 }
 
