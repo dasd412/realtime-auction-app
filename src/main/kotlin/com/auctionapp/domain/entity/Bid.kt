@@ -10,9 +10,9 @@ class Bid(
     @Embedded
     val amount: Money,
     val createdAt: LocalDateTime = LocalDateTime.now(),
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     val user: User,
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     val auction: Auction,
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

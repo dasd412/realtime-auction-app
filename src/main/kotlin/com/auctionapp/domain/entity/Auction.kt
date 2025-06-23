@@ -69,7 +69,7 @@ class Auction(
     val endTime: LocalDateTime,
     @Enumerated(EnumType.STRING)
     var status: AuctionStatus = AuctionStatus.NOT_STARTED,
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     val user: User,
     @OneToOne
     val product: Product,

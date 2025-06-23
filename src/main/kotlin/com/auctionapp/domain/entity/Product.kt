@@ -2,13 +2,7 @@ package com.auctionapp.domain.entity
 
 import com.auctionapp.domain.exception.InvalidProductImageUrlException
 import com.auctionapp.domain.exception.InvalidProductNameException
-import jakarta.persistence.Entity
-import jakarta.persistence.EnumType
-import jakarta.persistence.Enumerated
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.ManyToOne
+import jakarta.persistence.*
 
 @Entity
 class Product(
@@ -17,7 +11,7 @@ class Product(
     imageUrl: String,
     @Enumerated(EnumType.STRING)
     var status: ProductStatus = ProductStatus.AVAILABLE,
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     val user: User,
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
