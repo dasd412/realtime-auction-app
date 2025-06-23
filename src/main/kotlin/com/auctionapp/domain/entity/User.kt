@@ -7,6 +7,7 @@ import jakarta.persistence.*
 import java.util.regex.Pattern
 
 @Entity
+@Table(name = "users")
 class User(
     @Embedded
     var email: Email,
