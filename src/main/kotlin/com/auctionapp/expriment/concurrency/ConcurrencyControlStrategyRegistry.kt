@@ -1,9 +1,7 @@
 package com.auctionapp.com.auctionapp.expriment.concurrency
 
 import com.auctionapp.domain.service.AuctionService
-import com.auctionapp.expriment.concurrency.strategy.ConcurrencyControlStrategy
-import com.auctionapp.expriment.concurrency.strategy.OptimisticLockingStrategy
-import com.auctionapp.expriment.concurrency.strategy.PessimisticLockingStrategy
+import com.auctionapp.expriment.concurrency.strategy.*
 import jakarta.annotation.PostConstruct
 import org.springframework.stereotype.Service
 
@@ -18,11 +16,14 @@ class ConcurrencyControlStrategyRegistry(
     fun init() {
         strategies["optimistic"] = OptimisticLockingStrategy(auctionService)
         strategies["pessimistic"] = PessimisticLockingStrategy(auctionService)
+        strategies["lock"] = LockStrategy(auctionService)
+        strategies["tryLock"] = TryLockStrategy(auctionService)
+        strategies["readWriteLock"] = ReadWriteLockStrategy(auctionService)
+        strategies["semaphore"] = SemaphoreStrategy(auctionService)
     }
 
     fun getCurrentStrategy(): ConcurrencyControlStrategy = strategies[currentStrategy]!!
 
-    // todo 런타임에 집어 넣을 수 있도록 컨트롤러에서 지정해야 함.
     fun setCurrentStrategy(strategyName: String) {
         require(strategies.containsKey(strategyName)) { "Unknown strategy: $strategyName" }
         currentStrategy = strategyName
