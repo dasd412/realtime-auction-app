@@ -26,7 +26,7 @@ interface AuctionRepository : JpaRepository<Auction, Long> {
         pageable: Pageable,
     ): Page<Auction>
 
-    // 인기순(입찰 수) 정렬 todo n+1 체크
+    // 인기순(입찰 수) 정렬 (paging이므로 fetch 안함.)
     @Query("SELECT a FROM Auction a LEFT JOIN a.bids b WHERE a.status = :status GROUP BY a ORDER BY COUNT(b) DESC")
     fun findByStatusOrderByBidsCountDesc(
         @Param("status") status: AuctionStatus,
@@ -43,16 +43,20 @@ interface AuctionRepository : JpaRepository<Auction, Long> {
         @Param("currentTime") currentTime: LocalDateTime,
     ): List<Auction> // 자동 종료 대상 경매 조회
 
-    // 사용자가 생성한 경매 목록 todo n+1 체크
+    // 사용자가 생성한 경매 목록  (paging이므로 fetch 안함.)
     fun findByUser(
         user: User,
         pageable: Pageable,
     ): Page<Auction>
 
-    // 특정 사용자가 입찰한 경매 목록 todo n+1 체크
+    // 특정 사용자가 입찰한 경매 목록  (paging이므로 fetch 안함.)
     @Query("SELECT a FROM Auction a JOIN a.bids b WHERE b.user = :user")
     fun findByBidUser(
         @Param("user") user: User,
         pageable: Pageable,
     ): Page<Auction>
+
+    // auction과 bids를 함께 조회하는 상세 조회 메서드
+    @Query("SELECT a FROM Auction a LEFT JOIN FETCH a.bids WHERE a.id = :auctionId")
+    fun findByIdWithBids(@Param("auctionId") auctionId: Long): Auction?
 }
