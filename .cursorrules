@@ -1,0 +1,71 @@
+{
+  "projectRules": {
+    "language": "kotlin",
+    "packageStructure": "DDD",
+    "architecture": "layered",
+    "testStrategy": "unit-test-first"
+  },
+  "codeStyle": {
+    "indentation": 4,
+    "maxLineLength": 120,
+    "kotlinStyle": "official",
+    "namingConventions": {
+      "classes": "PascalCase",
+      "functions": "camelCase",
+      "variables": "camelCase",
+      "constants": "UPPER_SNAKE_CASE",
+      "packages": "lowercase"
+    }
+  },
+  "domainRules": {
+    "entities": {
+      "mustHaveIdField": true,
+      "preferImmutability": true,
+      "validateInConstructor": true
+    },
+    "valueObjects": {
+      "mustBeImmutable": true,
+      "mustValidate": true
+    },
+    "exceptions": {
+      "preferUnchecked": true,
+      "useCustomExceptions": true
+    }
+  },
+  "testingRules": {
+    "domainTests": {
+      "strategy": "pure-logic",
+      "naming": "korean-backtick",
+      "pattern": "given-when-then"
+    },
+    "repositoryTests": {
+      "strategy": "custom-query-focus",
+      "useInMemoryDb": true
+    },
+    "serviceTests": {
+      "strategy": "mock-dependencies",
+      "focusOnFlow": true
+    },
+    "controllerTests": {
+      "strategy": "response-validation",
+      "useMockMvc": true
+    }
+  },
+  "layerDependencies": {
+    "domain": [],
+    "application": ["domain"],
+    "infrastructure": ["domain", "application"]
+  },
+  "redisUsage": {
+    "purpose": "jwt-token-management",
+    "noDistributedLock": true
+  },
+  "concurrencyControl": {
+    "strategies": ["optimistic-lock", "pessimistic-lock"],
+    "versionField": true
+  },
+  "eventArchitecture": {
+    "useDomainEvents": true,
+    "asyncHandling": true
+  }
+} 
