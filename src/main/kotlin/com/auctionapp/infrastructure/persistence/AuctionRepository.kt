@@ -12,9 +12,25 @@ import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
 
+interface AuctionDetail {
+    fun getAuction(): Auction
+
+    fun getBidCount(): Long
+
+    fun getHighestBidAmount(): Long?
+}
+
 @Repository
 interface AuctionRepository : JpaRepository<Auction, Long> {
     fun findByProduct(product: Product): Auction?
+
+    @Query(
+        "SELECT a AS auction, COUNT(b) AS bidCount, MAX(b.amount.amount) AS highestBidAmount " +
+            "FROM Auction a LEFT JOIN a.bids b WHERE a.id = :auctionId GROUP BY a",
+    )
+    fun findAuctionDetailById(
+        @Param("auctionId") auctionId: Long,
+    ): AuctionDetail?
 
     fun findByStatus(
         status: AuctionStatus,

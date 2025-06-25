@@ -107,49 +107,6 @@ class BidRepositoryTest
         }
 
         @Test
-        @DisplayName("경매의 최고 입찰가를 조회한다")
-        fun findHighestAmountByAuctionIdTest() {
-            // when
-            val highestAmount = bidRepository.findHighestAmountByAuctionId(auction.id!!)
-
-            // then
-            assertThat(highestAmount).isEqualTo(2500L) // bid3의 금액
-        }
-
-        @Test
-        @DisplayName("경매의 입찰 수를 조회한다")
-        fun countByAuctionIdTest() {
-            // when
-            val count = bidRepository.countByAuctionId(auction.id!!)
-
-            // then
-            assertThat(count).isEqualTo(3)
-        }
-
-        @Test
-        @DisplayName("입찰이 없는 경매의 최고 입찰가는 null을 반환한다")
-        fun findHighestAmountByAuctionIdWithNoBidTest() {
-            // given
-            val emptyAuction =
-                Auction(
-                    initialPrice = Money(2000L),
-                    minimumBidUnit = Money(200L),
-                    startTime = now.minusHours(1),
-                    endTime = now.plusHours(1),
-                    status = AuctionStatus.ACTIVE,
-                    user = seller,
-                    product = product,
-                )
-            auctionRepository.save(emptyAuction)
-
-            // when
-            val highestAmount = bidRepository.findHighestAmountByAuctionId(emptyAuction.id!!)
-
-            // then
-            assertThat(highestAmount).isNull()
-        }
-
-        @Test
         @DisplayName("페이지 크기를 제한하여 경매별 입찰 내역을 조회한다")
         fun findByAuctionWithPageSizeLimitTest() {
             // when

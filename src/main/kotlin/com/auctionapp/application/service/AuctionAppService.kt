@@ -7,10 +7,7 @@ import com.auctionapp.domain.entity.Auction
 import com.auctionapp.domain.entity.AuctionStatus
 import com.auctionapp.domain.entity.Bid
 import com.auctionapp.domain.service.AuctionService
-import com.auctionapp.infrastructure.persistence.AuctionRepository
-import com.auctionapp.infrastructure.persistence.BidRepository
-import com.auctionapp.infrastructure.persistence.ProductRepository
-import com.auctionapp.infrastructure.persistence.UserRepository
+import com.auctionapp.infrastructure.persistence.*
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
@@ -71,11 +68,8 @@ class AuctionAppService(
     }
 
     @Transactional(readOnly = true)
-    fun getAuctionDetail(auctionId: Long): Triple<Auction, Long?, Long> {
-        val auction = auctionRepository.findByIdOrNull(auctionId) ?: throw NotFoundAuctionException()
-        val highestBidAmount = bidRepository.findHighestAmountByAuctionId(auctionId)
-        val bidCount = bidRepository.countByAuctionId(auctionId)
-        return Triple(auction, highestBidAmount, bidCount)
+    fun getAuctionDetail(auctionId: Long): AuctionDetail {
+        return auctionRepository.findAuctionDetailById(auctionId) ?: throw NotFoundAuctionException()
     }
 
     @Transactional

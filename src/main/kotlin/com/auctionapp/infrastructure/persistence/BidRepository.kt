@@ -23,14 +23,4 @@ interface BidRepository : JpaRepository<Bid, Long> {
         @Param("user") user: User,
         pageable: Pageable,
     ): Page<Bid>
-
-    @Query("SELECT MAX(b.amount.amount) FROM Bid b WHERE b.auction.id = :auctionId")
-    fun findHighestAmountByAuctionId(
-        @Param("auctionId") auctionId: Long,
-    ): Long?
-
-    @Query("SELECT COUNT(b) FROM Bid b WHERE b.auction.id = :auctionId")
-    fun countByAuctionId(
-        @Param("auctionId") auctionId: Long,
-    ): Long
 }

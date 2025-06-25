@@ -441,4 +441,66 @@ class AuctionRepositoryTest
                 )
             }
         }
+
+        @Test
+        @DisplayName("경매 ID로 경매 상세 정보를 조회한다")
+        fun findAuctionDetailByIdTest() {
+            // given
+            entityManager.flush()
+            entityManager.clear()
+
+            // when
+            val auctionDetail = auctionRepository.findAuctionDetailById(activeAuction.id!!)
+
+            // then
+            assertThat(auctionDetail).isNotNull
+
+            // 경매 정보 확인
+            val auction = auctionDetail!!.getAuction()
+            assertThat(auction.id).isEqualTo(activeAuction.id)
+            assertThat(auction.initialPrice.amount).isEqualTo(1000L)
+
+            // 입찰 수 확인
+            assertThat(auctionDetail.getBidCount()).isEqualTo(3L)
+
+            // 최고 입찰가 확인
+            assertThat(auctionDetail.getHighestBidAmount()).isEqualTo(2500L) // bid3의 금액
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 경매 ID로 조회시 null을 반환한다")
+        fun findAuctionDetailByNonExistentIdTest() {
+            // given
+            val nonExistentId = 9999L // 존재하지 않는 ID
+
+            // when
+            val auctionDetail = auctionRepository.findAuctionDetailById(nonExistentId)
+
+            // then
+            assertThat(auctionDetail).isNull()
+        }
+
+        @Test
+        @DisplayName("입찰이 없는 경매의 상세 정보를 조회한다")
+        fun findAuctionDetailByIdWithNoBidTest() {
+            // given
+            entityManager.flush()
+            entityManager.clear()
+
+            // when
+            val auctionDetail = auctionRepository.findAuctionDetailById(notStartedAuction.id!!)
+
+            // then
+            assertThat(auctionDetail).isNotNull
+
+            // 경매 정보 확인
+            val auction = auctionDetail!!.getAuction()
+            assertThat(auction.id).isEqualTo(notStartedAuction.id)
+
+            // 입찰이 없는 경우 입찰 수는 0
+            assertThat(auctionDetail.getBidCount()).isEqualTo(0L)
+
+            // 최고 입찰가는 null (또는 0)
+            assertThat(auctionDetail.getHighestBidAmount()).isNull()
+        }
     }
