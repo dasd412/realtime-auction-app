@@ -11,16 +11,26 @@ import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 
 @Repository
-interface BidRepository : JpaRepository<Bid, Long>{
+interface BidRepository : JpaRepository<Bid, Long> {
     @Query("SELECT b FROM Bid b WHERE b.auction = :auction ORDER BY b.createdAt DESC")
-    fun findByAuctionOrderByCreatedAtDesc(@Param("auction")auction: Auction, pageable: Pageable): Page<Bid>
+    fun findByAuctionOrderByCreatedAtDesc(
+        @Param("auction")auction: Auction,
+        pageable: Pageable,
+    ): Page<Bid>
 
     @Query("SELECT b FROM Bid b WHERE b.user = :user ORDER BY b.createdAt DESC")
-    fun findByUserOrderByCreatedAtDesc(@Param("user") user: User, pageable: Pageable):Page<Bid>
+    fun findByUserOrderByCreatedAtDesc(
+        @Param("user") user: User,
+        pageable: Pageable,
+    ): Page<Bid>
 
     @Query("SELECT MAX(b.amount.amount) FROM Bid b WHERE b.auction.id = :auctionId")
-    fun findHighestAmountByAuctionId(@Param("auctionId") auctionId: Long): Long?
+    fun findHighestAmountByAuctionId(
+        @Param("auctionId") auctionId: Long,
+    ): Long?
 
     @Query("SELECT COUNT(b) FROM Bid b WHERE b.auction.id = :auctionId")
-    fun countByAuctionId(@Param("auctionId") auctionId: Long): Long
+    fun countByAuctionId(
+        @Param("auctionId") auctionId: Long,
+    ): Long
 }

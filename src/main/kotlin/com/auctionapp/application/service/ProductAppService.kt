@@ -1,5 +1,5 @@
-package com.auctionapp.com.auctionapp.application.service
-
+package com.auctionapp.application.service
+import com.auctionapp.application.constant.DEFAULT_PRODUCT_PAGE_SIZE
 import com.auctionapp.application.exception.NotFoundProductException
 import com.auctionapp.application.exception.NotFoundUserException
 import com.auctionapp.application.exception.NotProductOwnerException
@@ -10,7 +10,7 @@ import com.auctionapp.infrastructure.persistence.AuctionRepository
 import com.auctionapp.infrastructure.persistence.ProductRepository
 import com.auctionapp.infrastructure.persistence.UserRepository
 import org.springframework.data.domain.Page
-import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -41,12 +41,15 @@ class ProductAppService(
     @Transactional(readOnly = true)
     fun getProductList(
         name: String? = null,
-        pageable: Pageable,
+        pageNumber: Int,
     ): Page<Product> {
         return if (name.isNullOrBlank()) {
-            productRepository.findAllByOrderByIdDesc(pageable)
+            productRepository.findAllByOrderByIdDesc(PageRequest.of(pageNumber, DEFAULT_PRODUCT_PAGE_SIZE))
         } else {
-            productRepository.findByNameContainingOrderByIdDesc(name, pageable)
+            productRepository.findByNameContainingOrderByIdDesc(
+                name,
+                PageRequest.of(pageNumber, DEFAULT_PRODUCT_PAGE_SIZE),
+            )
         }
     }
 

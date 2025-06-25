@@ -33,11 +33,13 @@ interface AuctionRepository : JpaRepository<Auction, Long> {
         pageable: Pageable,
     ): Page<Auction>
 
+    // todo 스케쥴러 구현 떄 사용할 예정
     @Query("SELECT a FROM Auction a WHERE a.status = 'NOT_STARTED' AND a.startTime <= :currentTime")
     fun findAuctionsToStart(
         @Param("currentTime") currentTime: LocalDateTime,
     ): List<Auction> // 자동 시작 대상 경매 조회
 
+    // todo 스케쥴러 구현 떄 사용할 예정
     @Query("SELECT a FROM Auction a WHERE a.status = 'ACTIVE' AND a.endTime >= :currentTime")
     fun findAuctionsToEnd(
         @Param("currentTime") currentTime: LocalDateTime,
