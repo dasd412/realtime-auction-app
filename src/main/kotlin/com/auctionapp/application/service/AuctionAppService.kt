@@ -2,11 +2,14 @@ package com.auctionapp.application.service
 
 import com.auctionapp.application.constant.DEFAULT_AUCTION_PAGE_SIZE
 import com.auctionapp.application.exception.NotFoundAuctionException
+import com.auctionapp.application.exception.NotFoundProductException
 import com.auctionapp.application.exception.NotFoundUserException
+import com.auctionapp.com.auctionapp.expriment.concurrency.ConcurrencyControlStrategyRegistry
 import com.auctionapp.domain.entity.Auction
 import com.auctionapp.domain.entity.AuctionStatus
 import com.auctionapp.domain.entity.Bid
 import com.auctionapp.domain.service.AuctionService
+import com.auctionapp.domain.vo.Money
 import com.auctionapp.infrastructure.persistence.*
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
@@ -28,6 +31,7 @@ class AuctionAppService(
     private val bidRepository: BidRepository,
     private val userRepository: UserRepository,
     private val productRepository: ProductRepository,
+    private val strategyRegistry: ConcurrencyControlStrategyRegistry,
 ) {
     @Transactional
     fun registerAuction(
@@ -38,6 +42,19 @@ class AuctionAppService(
         startTime: LocalDateTime,
         endTime: LocalDateTime,
     ) {
+        val user = userRepository.findByIdOrNull(userId) ?: throw NotFoundUserException()
+        val product = productRepository.findByIdOrNull(productId) ?: throw NotFoundProductException()
+        val auction =
+            Auction(
+                initialPrice = Money(initialPrice),
+                minimumBidUnit = Money(minimumBidUnit),
+                user = user,
+                product = product,
+                startTime = startTime,
+                endTime = endTime,
+            )
+
+        auctionService.registerAuction(auction, user, product)
     }
 
     @Transactional(readOnly = true)
@@ -77,16 +94,24 @@ class AuctionAppService(
         userId: Long,
         auctionId: Long,
     ) {
+        val user = userRepository.findByIdOrNull(userId) ?: throw NotFoundUserException()
+        val auction = auctionRepository.findByIdOrNull(auctionId) ?: throw NotFoundAuctionException()
+        auctionService.cancelAuction(auction, user)
     }
 
-    // todo 동시성 제어와 도메인 이벤트 발행
     @Transactional
     fun placeBid(
         userId: Long,
-        id: Long,
+        auctionId: Long,
         amount: Long,
     ): Long {
-        return 1L
+        val user = userRepository.findByIdOrNull(userId) ?: throw NotFoundUserException()
+        val auction = auctionRepository.findByIdOrNull(auctionId) ?: throw NotFoundAuctionException()
+        val money = Money(amount)
+
+        val strategy = strategyRegistry.getCurrentStrategy()
+        val bid = strategy.placeBid(auction, user, money)
+        return bid.id!!
     }
 
     @Transactional(readOnly = true)
