@@ -55,8 +55,4 @@ interface AuctionRepository : JpaRepository<Auction, Long> {
         @Param("user") user: User,
         pageable: Pageable,
     ): Page<Auction>
-
-    // auction과 bids를 함께 조회하는 상세 조회 메서드
-    @Query("SELECT a FROM Auction a LEFT JOIN FETCH a.bids WHERE a.id = :auctionId")
-    fun findByIdWithBids(@Param("auctionId") auctionId: Long): Auction?
 }
