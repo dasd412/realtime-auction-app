@@ -1,0 +1,115 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# 실시간 경매 플랫폼 이벤트 아키텍처
+
+## 이벤트 기반 아키텍처의 필요성
+
+실시간 경매 시스템에서는 다양한 이벤트(경매 시작, 입찰 발생, 경매 종료 등)가 발생하며, 이러한 이벤트에 대한 처리가 필요합니다. 이벤트 기반 아키텍처를 통해 시스템 컴포넌트 간의 느슨한 결합을 유지하고, 확장성을 향상시킬 수 있습니다.
+
+## 도메인 이벤트
+
+### 이벤트 정의
+
+```kotlin
+interface DomainEvent {
+    val occurredOn: LocalDateTime
+}
+
+data class AuctionStartedEvent(
+    val auctionId: Long,
+    override val occurredOn: LocalDateTime = LocalDateTime.now(),
+) : DomainEvent
+
+data class AuctionEndedEvent(
+    val auctionId: Long,
+    val winnerId: Long?,
+    override val occurredOn: LocalDateTime = LocalDateTime.now(),
+) : DomainEvent
+
+data class BidPlacedEvent(
+    val auctionId: Long,
+    val bidId: Long,
+    val money: Money,
+    override val occurredOn: LocalDateTime = LocalDateTime.now(),
+) : DomainEvent
+```
+
+### 이벤트 발행
+
+도메인 엔티티 내부에서 이벤트를 발행합니다.
+
+```kotlin
+class Auction {
+    // ... 다른 필드와 메서드
+    
+    fun placeBid(bidder: User, amount: Money): Bid {
+        // 입찰 로직
+        val bid = Bid(auction = this, bidder = bidder, amount = amount)
+        
+        // 이벤트 발행
+        DomainEventPublisher.publish(
+            BidPlacedEvent(
+                auctionId = this.id!!,
+                bidId = bid.id!!,
+                money = amount
+            )
+        )
+        
+        return bid
+    }
+}
+```
+
+## 이벤트 핸들러
+
+### 핸들러 인터페이스
+
+```kotlin
+interface DomainEventHandler<T : DomainEvent> {
+    fun handle(event: T)
+}
+```
+
+### 구체적인 핸들러 구현
+
+```kotlin
+@Component
+class BidPlacedEventHandler(
+    private val webSocketService: WebSocketService
+) : DomainEventHandler<BidPlacedEvent> {
+    
+    override fun handle(event: BidPlacedEvent) {
+        // 실시간 입찰 정보를 웹소켓을 통해 클라이언트에게 전송
+        webSocketService.sendBidUpdate(event.auctionId, event.bidId, event.money)
+    }
+}
+```
+
+## 이벤트 발행자
+
+```kotlin
+object DomainEventPublisher {
+    private val handlers = mutableMapOf<Class<out DomainEvent>, MutableList<DomainEventHandler<DomainEvent>>>()
+    
+    fun <T : DomainEvent> register(eventType: Class<T>, handler: DomainEventHandler<T>) {
+        handlers.getOrPut(eventType) { mutableListOf() }
+            .add(handler as DomainEventHandler<DomainEvent>)
+    }
+    
+    fun publish(event: DomainEvent) {
+        handlers[event::class.java]?.forEach { handler ->
+            handler.handle(event)
+        }
+    }
+}
+```
+
+## 이벤트 활용 사례
+
+- 실시간 입찰 정보 전송
+- 경매 시작/종료 알림
+- 통계 데이터 수집
+- 이메일 알림 발송
