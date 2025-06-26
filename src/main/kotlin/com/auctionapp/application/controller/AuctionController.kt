@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/api/auctions")
 class AuctionController(
-    private val strategyRegistry: ConcurrencyControlStrategyRegistry
+    private val strategyRegistry: ConcurrencyControlStrategyRegistry,
 ) {
     @GetMapping("/admin/strategy")
     fun getCurrentStrategy(): String {
@@ -14,7 +14,9 @@ class AuctionController(
     }
 
     @PostMapping("/admin/strategy")
-    fun changeStrategy(@RequestParam strategy: String): String {
+    fun changeStrategy(
+        @RequestParam strategy: String,
+    ): String {
         strategyRegistry.setCurrentStrategy(strategy)
         return strategyRegistry.getCurrentStrategyName()
     }

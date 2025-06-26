@@ -6,7 +6,7 @@ import com.auctionapp.domain.entity.User
 import com.auctionapp.domain.service.AuctionService
 import com.auctionapp.domain.vo.Money
 
-class AtomicCasStrategy (
+class AtomicCasStrategy(
     private val auctionService: AuctionService,
 ) : ConcurrencyControlStrategy {
     override fun placeBid(
