@@ -1,4 +1,5 @@
 package com.auctionapp.application.service
+
 import com.auctionapp.application.constant.DEFAULT_PRODUCT_PAGE_SIZE
 import com.auctionapp.application.exception.NotFoundProductException
 import com.auctionapp.application.exception.NotFoundUserException
@@ -59,20 +60,20 @@ class ProductAppService(
     }
 
     @Transactional(readOnly = true)
-    fun getProductDetail(id: Long): Product {
-        val found = productRepository.findByIdOrNull(id) ?: throw NotFoundProductException()
+    fun getProductDetail(productId: Long): Product {
+        val found = productRepository.findByIdOrNull(productId) ?: throw NotFoundProductException()
         return found
     }
 
     @Transactional
     fun updateProduct(
         userId: Long,
-        id: Long,
+        productId: Long,
         name: String,
         description: String?,
         imageUrl: String,
     ) {
-        val found = productRepository.findByIdOrNull(id) ?: throw NotFoundProductException()
+        val found = productRepository.findByIdOrNull(productId) ?: throw NotFoundProductException()
 
         if (found.user.id != userId) {
             throw NotProductOwnerException()
@@ -94,9 +95,9 @@ class ProductAppService(
     @Transactional
     fun deleteProduct(
         userId: Long,
-        id: Long,
+        productId: Long,
     ) {
-        val found = productRepository.findByIdOrNull(id) ?: throw NotFoundProductException()
+        val found = productRepository.findByIdOrNull(productId) ?: throw NotFoundProductException()
 
         if (found.user.id != userId) {
             throw NotProductOwnerException()
