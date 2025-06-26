@@ -1,0 +1,226 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# 실시간 경매 플랫폼 보안 전략
+
+## 인증 및 인가 전략
+
+1. **JWT 기반 인증**
+   - Stateless 인증으로 서버 확장성 개선
+   - Access Token과 Refresh Token 분리
+   - Redis를 활용한 토큰 관리
+
+2. **역할 기반 접근 제어(RBAC)**
+   - 사용자 역할: ADMIN, CUSTOMER
+   - 각 역할별 권한 명시적 설정
+   - Spring Security의 메소드 보안 활용
+
+3. **API 엔드포인트 보안**
+   - RESTful API 인증 필터
+   - CORS 설정
+   - CSRF 보호
+
+## JWT 토큰 관리 전략
+
+```
+┌───────────────┐     ┌───────────────┐     ┌───────────────┐
+│    로그인     │────►│ Access Token  │────►│     Redis     │
+│               │     │  (30분 유효)  │     │Token Blacklist│
+└───────┬───────┘     └───────────────┘     └───────────────┘
+        │                                           ▲
+        │                                           │
+        ▼                                           │
+┌───────────────┐     ┌───────────────┐     ┌───────────────┐
+│ Refresh Token │────►│   토큰 재발급  │────►│  로그아웃 시  │
+│  (7일 유효)   │     │               │     │  토큰 무효화  │
+└───────────────┘     └───────────────┘     └───────────────┘
+```
+
+### JWT 관련 Spring Security 설정
+
+```kotlin
+@Configuration
+@EnableWebSecurity
+class SecurityConfig(
+    private val jwtTokenProvider: JwtTokenProvider,
+    private val redisTemplate: RedisTemplate<String, String>
+) {
+    
+    @Bean
+    fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
+        return http
+            .csrf { it.disable() }
+            .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
+            .authorizeHttpRequests { auth -> 
+                auth
+                    .requestMatchers("/api/auth/**").permitAll()
+                    .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                    .anyRequest().authenticated()
+            }
+            .addFilterBefore(
+                JwtAuthenticationFilter(jwtTokenProvider, redisTemplate),
+                UsernamePasswordAuthenticationFilter::class.java
+            )
+            .build()
+    }
+}
+```
+
+### JWT 토큰 제공자
+
+```kotlin
+@Component
+class JwtTokenProvider(
+    @Value("\${app.jwt.secret}") private val secretKey: String,
+    private val redisTemplate: RedisTemplate<String, String>
+) {
+    
+    private val accessTokenValidityMs = 30 * 60 * 1000L // 30분
+    private val refreshTokenValidityMs = 7 * 24 * 60 * 60 * 1000L // 7일
+    
+    private val key: Key = Keys.hmacShaKeyFor(
+        Decoders.BASE64.decode(secretKey)
+    )
+    
+    fun createAccessToken(authentication: Authentication): String {
+        val now = Date()
+        val validity = Date(now.time + accessTokenValidityMs)
+        
+        return Jwts.builder()
+            .setSubject(authentication.name)
+            .claim("authorities", authentication.authorities.joinToString(",") { it.authority })
+            .setIssuedAt(now)
+            .setExpiration(validity)
+            .signWith(key, SignatureAlgorithm.HS512)
+            .compact()
+    }
+    
+    fun createRefreshToken(authentication: Authentication): String {
+        val now = Date()
+        val validity = Date(now.time + refreshTokenValidityMs)
+        
+        val refreshToken = Jwts.builder()
+            .setSubject(authentication.name)
+            .setIssuedAt(now)
+            .setExpiration(validity)
+            .signWith(key, SignatureAlgorithm.HS512)
+            .compact()
+        
+        // Redis에 저장
+        redisTemplate.opsForValue().set(
+            "RT:" + authentication.name,
+            refreshToken,
+            refreshTokenValidityMs,
+            TimeUnit.MILLISECONDS
+        )
+        
+        return refreshToken
+    }
+    
+    // 토큰 검증 및 사용자 인증 정보 추출 메서드들...
+}
+```
+
+## 로그아웃 및 토큰 무효화
+
+```kotlin
+@RestController
+@RequestMapping("/api/auth")
+class AuthController(
+    private val jwtTokenProvider: JwtTokenProvider,
+    private val redisTemplate: RedisTemplate<String, String>
+) {
+    
+    @PostMapping("/logout")
+    fun logout(
+        @RequestHeader("Authorization") authHeader: String,
+        authentication: Authentication
+    ): ResponseEntity<String> {
+        val accessToken = authHeader.replace("Bearer ", "")
+        val username = authentication.name
+        
+        // Access Token 남은 유효시간 계산
+        val expiration = jwtTokenProvider.getExpirationFromToken(accessToken)
+        val ttl = expiration.time - Date().time
+        
+        // Access Token을 블랙리스트에 추가
+        redisTemplate.opsForValue().set(
+            "BL:" + accessToken,
+            "logout",
+            ttl,
+            TimeUnit.MILLISECONDS
+        )
+        
+        // Refresh Token 제거
+        redisTemplate.delete("RT:" + username)
+        
+        return ResponseEntity.ok("로그아웃 되었습니다.")
+    }
+}
+```
+
+## 보안 취약점 완화 전략
+
+1. **입력값 검증**
+   - 모든 사용자 입력 검증
+   - Bean Validation 활용
+
+2. **민감 정보 보호**
+   - 비밀번호 해싱 (BCrypt)
+   - 개인정보 암호화 저장
+
+3. **API Rate Limiting**
+   - Redis와 Bucket4j를 활용한 API 호출 제한
+   - IP 및 사용자별 제한 적용
+
+4. **로깅 및 모니터링**
+   - 중요 보안 이벤트 로깅
+   - 비정상 접근 패턴 감지
+
+## 보안 테스트 전략
+
+```kotlin
+@SpringBootTest
+@AutoConfigureMockMvc
+class SecurityTest {
+    
+    @Autowired
+    private lateinit var mockMvc: MockMvc
+    
+    @Test
+    @DisplayName("인증 없이 보호된 API 접근 시 401 에러가 발생한다")
+    fun accessProtectedApiWithoutAuthentication_shouldReturn401() {
+        // given, when, then
+        mockMvc.perform(get("/api/auctions"))
+            .andExpect(status().isUnauthorized())
+    }
+    
+    @Test
+    @DisplayName("유효한 토큰으로 API 접근 시 성공한다")
+    fun accessApiWithValidToken_shouldSucceed() {
+        // given
+        val token = generateValidToken("user", listOf("ROLE_CUSTOMER"))
+        
+        // when, then
+        mockMvc.perform(get("/api/auctions")
+            .header("Authorization", "Bearer $token"))
+            .andExpect(status().isOk())
+    }
+    
+    @Test
+    @DisplayName("ADMIN 권한이 필요한 API에 일반 사용자가 접근 시 403 에러가 발생한다")
+    fun accessAdminApiWithCustomerRole_shouldReturn403() {
+        // given
+        val token = generateValidToken("user", listOf("ROLE_CUSTOMER"))
+        
+        // when, then
+        mockMvc.perform(get("/api/admin/users")
+            .header("Authorization", "Bearer $token"))
+            .andExpect(status().isForbidden())
+    }
+    
+    // 테스트용 토큰 생성 메서드...
+}
+```

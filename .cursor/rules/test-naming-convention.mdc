@@ -1,0 +1,84 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# 실시간 경매 플랫폼 테스트 명명 규칙
+
+## 테스트 명명 원칙
+
+1. **테스트 클래스명**
+   - 테스트 대상 클래스 + `Test` 접미사 사용
+   - 예시: `UserTest`, `AuctionServiceTest`, `ProductRepositoryTest`
+
+2. **테스트 메소드명 규칙**
+   - 메소드명은 영문명으로 작성 (camelCase)
+   - 메소드가 테스트하는 내용을 설명하는 명확한 이름 사용
+   - 형식: `[테스트대상]_[상황]_[기대결과]` 또는 `[상황]_[기대결과]`
+   - 예시: `placeHigherBid_shouldBeAccepted`, `closeAuction_whenNoValidBids_shouldThrowException`
+
+3. **한글 DisplayName 사용**
+   - 모든 테스트 메소드에 `@DisplayName` 어노테이션으로 한글 설명 추가
+   - 한글 설명은 "~하면 ~한다" 또는 "~할 때 ~하다" 형식으로 작성
+   - 예시: `@DisplayName("최소 입찰액보다 높은 입찰이면 성공한다")`
+
+## 예시
+
+```kotlin
+@DisplayName("경매 도메인 테스트")
+class AuctionTest {
+    
+    @Test
+    @DisplayName("최소 입찰액보다 높은 입찰이면 성공한다")
+    fun placeBidHigherThanMinimum_shouldBeAccepted() {
+        // given
+        val auction = Auction.fixture(minBidAmount = Money(1000))
+        val bidAmount = Money(2000)
+        
+        // when
+        val result = auction.placeBid(User.fixture(), bidAmount)
+        
+        // then
+        assertThat(result.isAccepted).isTrue()
+    }
+    
+    @Test
+    @DisplayName("이미 종료된 경매에 입찰하면 예외가 발생한다")
+    fun placeBidOnClosedAuction_shouldThrowException() {
+        // given
+        val auction = Auction.fixture(status = AuctionStatus.ENDED)
+        val bidAmount = Money(2000)
+        
+        // when, then
+        assertThrows<AuctionEndedException> {
+            auction.placeBid(User.fixture(), bidAmount)
+        }
+    }
+}
+```
+
+## 레이어별 테스트 명명 가이드라인
+
+### 도메인 레이어 테스트
+
+- 테스트 클래스: `[엔티티 또는 값객체명]Test`
+- 테스트 메소드: 도메인 행위 중심의 명명 (예: `placeBid_withInvalidAmount_shouldThrowException`)
+- DisplayName: 자연어로 행위와 결과 설명 (예: "유효하지 않은 금액으로 입찰하면 예외가 발생한다")
+
+### 리포지토리 레이어 테스트
+
+- 테스트 클래스: `[리포지토리명]Test`
+- 테스트 메소드: 쿼리 동작 중심의 명명 (예: `findOngoingAuctionWithBids_shouldReturnCorrectResult`)
+- DisplayName: 쿼리 목적과 결과 설명 (예: "진행 중인 경매와 입찰 정보를 함께 조회한다")
+
+### 애플리케이션 서비스 레이어 테스트
+
+- 테스트 클래스: `[서비스명]Test`
+- 테스트 메소드: 유스케이스 중심의 명명 (예: `registerProductWithValidData_shouldSaveProduct`)
+- DisplayName: 유스케이스 시나리오 설명 (예: "유효한 상품 데이터로 등록하면 저장에 성공한다")
+
+### 컨트롤러 레이어 테스트
+
+- 테스트 클래스: `[컨트롤러명]Test`
+- 테스트 메소드: API 엔드포인트 동작 중심 명명 (예: `getAuctionDetails_withValidId_returnsOk`)
+- DisplayName: API 요청과 응답 설명 (예: "유효한 경매 ID로 조회 시 상세 정보를 반환한다")
