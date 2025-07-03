@@ -270,14 +270,12 @@ class ProductAppServiceTest {
         every { auctionRepository.findByProduct(product) } returns auction
         every { product.user.id } returns userId
         every { product.canUpdateOrDelete(auction) } returns true
-        every { productRepository.save(any()) } returns product
 
         // when
         productAppService.updateProduct(userId, productId, "테스트 상품", "설명", "http://example.com/image.jpg")
 
         // then
         verify(exactly = 1) { productRepository.findByIdOrNull(productId) }
-        verify(exactly = 1) { productRepository.save(any()) }
     }
 
     @Test

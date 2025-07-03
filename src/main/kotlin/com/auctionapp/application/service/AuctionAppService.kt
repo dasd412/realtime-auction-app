@@ -55,6 +55,7 @@ class AuctionAppService(
             )
 
         auctionService.registerAuction(auction, user, product)
+        auctionRepository.save(auction)
     }
 
     @Transactional(readOnly = true)
@@ -111,7 +112,10 @@ class AuctionAppService(
 
         val strategy = strategyRegistry.getCurrentStrategy()
         val bid = strategy.placeBid(auction, user, money)
-        return bid.id!!
+
+        val savedBid = bidRepository.save(bid)
+
+        return savedBid.id!!
     }
 
     @Transactional(readOnly = true)

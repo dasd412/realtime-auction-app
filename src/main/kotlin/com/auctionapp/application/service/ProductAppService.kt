@@ -88,8 +88,6 @@ class ProductAppService(
         found.name = name
         found.description = description
         found.imageUrl = imageUrl
-
-        productRepository.save(found)
     }
 
     @Transactional
