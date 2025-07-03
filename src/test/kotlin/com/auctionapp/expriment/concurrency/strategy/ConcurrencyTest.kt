@@ -3,6 +3,7 @@ package com.auctionapp.expriment.concurrency.strategy
 import com.auctionapp.domain.entity.*
 import com.auctionapp.domain.service.AuctionService
 import com.auctionapp.domain.vo.Money
+import io.mockk.InternalPlatformDsl.toStr
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -25,17 +26,39 @@ class ConcurrencyTest(
     @BeforeEach
     fun setup() {
         user1 = User.fixture(id = 1L)
-        val product = Product.fixture(status = ProductStatus.AVAILABLE, user = user1)
-        auction = Auction.fixture(product = product, user = user1, status = AuctionStatus.ACTIVE)
+        val product = Product.fixture(status = ProductStatus.AVAILABLE, user = user1, id = 1L)
+        auction = Auction.fixture(product = product, user = user1, status = AuctionStatus.ACTIVE, id = 1L)
     }
 
-    /*
-    1. executors.submit으로 제출된 태스크에서 발생하는 예외는 해당 스레드 내에서만 발생하고 메인 테스트 스레드로 자동 전파되지 않습니다.
-    2. assertThrows는 같은 스레드에서 즉시 발생하는 예외만 감지할 수 있습니다.
-     */
     @Test
     @DisplayName("동시 입찰인 경우 최고 입찰가가 중요하다(synchronized 키워드)")
     fun synchronized_success() {
+        success(SynchronizedStrategy(auctionService))
+    }
+
+    @Test
+    @DisplayName("같은 금액으로 동시 입찰을 할 경우, 단 하나만 성공한다(synchronized 키워드)")
+    fun synchronized_only_one_success() {
+        onlyOneSuccess(SynchronizedStrategy(auctionService))
+    }
+
+    @Test
+    @DisplayName("동시 입찰인 경우 최고 입찰가가 중요하다(tryLock)")
+    fun tryLock_success() {
+        success(TryLockStrategy(auctionService))
+    }
+
+    @Test
+    @DisplayName("같은 금액으로 동시 입찰을 할 경우, 단 하나만 성공한다(tryLock)")
+    fun tryLock_only_one_success() {
+        onlyOneSuccess(TryLockStrategy(auctionService))
+    }
+
+    /*
+        1. executors.submit으로 제출된 태스크에서 발생하는 예외는 해당 스레드 내에서만 발생하고 메인 테스트 스레드로 자동 전파되지 않습니다.
+        2. assertThrows는 같은 스레드에서 즉시 발생하는 예외만 감지할 수 있습니다.
+     */
+    private fun success(strategy: ConcurrencyControlStrategy) {
         // given
         val threadCount = 1000
         val latch = CountDownLatch(threadCount)
@@ -43,7 +66,6 @@ class ConcurrencyTest(
         val futures = mutableListOf<Future<*>>()
         val successCount = AtomicInteger(0)
         val failCount = AtomicInteger(0)
-        val strategy = SynchronizedStrategy(auctionService)
 
         val testStartTime = System.currentTimeMillis()
 
@@ -76,16 +98,14 @@ class ConcurrencyTest(
 
         // then
         assertThat(auction.getHighestBid()?.amount?.amount).isEqualTo(1000000L)
-        println("==== synchronized 전략 성능 측정 결과 ====")
+        println("==== ${strategy.toStr()} 전략 성능 측정 결과 ====")
         println("전체 실행 시간: ${totalTime}ms")
         println("입찰 성공 횟수 (입찰 순서에 따라 결과가 달라질 수 있음): ${successCount.get()}회")
         println("입찰 실패 횟수 (입찰 순서에 따라 결과가 달라질 수 있음): ${failCount.get()}회")
         println("======================================")
     }
 
-    @Test
-    @DisplayName("같은 금액으로 동시 입찰을 할 경우, 단 하나만 성공한다(synchronized 키워드)")
-    fun synchronized_only_one_success() {
+    private fun onlyOneSuccess(strategy: ConcurrencyControlStrategy) {
         // given
         val threadCount = 1000
         val latch = CountDownLatch(threadCount)
@@ -93,7 +113,6 @@ class ConcurrencyTest(
         val futures = mutableListOf<Future<*>>()
         val successCount = AtomicInteger(0)
         val failCount = AtomicInteger(0)
-        val strategy = SynchronizedStrategy(auctionService)
 
         // when
         for (i in 0 until threadCount) {
