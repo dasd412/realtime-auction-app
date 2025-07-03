@@ -115,6 +115,8 @@ class AuctionAppService(
 
         val savedBid = bidRepository.save(bid)
 
+        auction.addBidEvent(savedBid)
+
         return savedBid.id!!
     }
 

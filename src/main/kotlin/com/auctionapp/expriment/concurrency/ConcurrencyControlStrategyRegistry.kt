@@ -16,7 +16,7 @@ class ConcurrencyControlStrategyRegistry(
     fun init() {
         strategies["optimistic"] = OptimisticLockingStrategy(auctionService)
         strategies["pessimistic"] = PessimisticLockingStrategy(auctionService)
-        strategies["lock"] = LockStrategy(auctionService)
+        strategies["synchronized"] = SynchronizedStrategy(auctionService)
         strategies["tryLock"] = TryLockStrategy(auctionService)
         strategies["readWriteLock"] = ReadWriteLockStrategy(auctionService)
         strategies["semaphore"] = SemaphoreStrategy(auctionService)

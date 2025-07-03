@@ -341,7 +341,7 @@ class AuctionAppServiceTest {
         val amount = 1000L
 
         val user = mockk<User>()
-        val auction = mockk<Auction>()
+        val auction = mockk<Auction>(relaxed = true)
         val bid = mockk<Bid>(relaxed = true)
         val strategy = mockk<ConcurrencyControlStrategy>()
 

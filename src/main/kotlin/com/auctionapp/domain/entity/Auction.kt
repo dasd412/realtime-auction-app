@@ -134,6 +134,9 @@ class Auction(
 
     fun addBid(bid: Bid) {
         bids.add(bid)
+    }
+
+    fun addBidEvent(bid: Bid) {
         if (id != null && bid.id != null) {
             domainEvents.add(BidPlacedEvent(id, bid.id, bid.amount))
         }
