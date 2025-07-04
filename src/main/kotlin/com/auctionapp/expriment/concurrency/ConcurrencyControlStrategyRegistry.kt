@@ -12,11 +12,10 @@ class ConcurrencyControlStrategyRegistry(
     private val auctionRepository: AuctionRepository,
 ) {
     private val strategies = mutableMapOf<String, ConcurrencyControlStrategy>()
-    private var currentStrategy: String = "optimistic" // 기본값
+    private var currentStrategy: String = "pessimistic" // 기본값
 
     @PostConstruct
     fun init() {
-        strategies["optimistic"] = OptimisticLockingStrategy(auctionService)
         strategies["pessimistic"] = PessimisticLockingStrategy(auctionService, auctionRepository)
         strategies["synchronized"] = SynchronizedStrategy(auctionService)
         strategies["tryLock"] = TryLockStrategy(auctionService)
