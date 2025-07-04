@@ -18,8 +18,8 @@ class ConcurrencyControlStrategyRegistry(
         strategies["pessimistic"] = PessimisticLockingStrategy(auctionService)
         strategies["synchronized"] = SynchronizedStrategy(auctionService)
         strategies["tryLock"] = TryLockStrategy(auctionService)
-        strategies["readWriteLock"] = ReadWriteLockStrategy(auctionService)
         strategies["semaphore"] = SemaphoreStrategy(auctionService)
+        strategies["cas"] = AtomicCasStrategy(auctionService)
     }
 
     fun getCurrentStrategy(): ConcurrencyControlStrategy = strategies[currentStrategy]!!

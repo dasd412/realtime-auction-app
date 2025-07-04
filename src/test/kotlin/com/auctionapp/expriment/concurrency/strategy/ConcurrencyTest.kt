@@ -54,6 +54,18 @@ class ConcurrencyTest(
         onlyOneSuccess(TryLockStrategy(auctionService))
     }
 
+    @Test
+    @DisplayName("동시 입찰인 경우 최고 입찰가가 중요하다(semaphore)")
+    fun semaphore_success() {
+        success(SemaphoreStrategy(auctionService))
+    }
+
+    @Test
+    @DisplayName("같은 금액으로 동시 입찰을 할 경우, 단 하나만 성공한다(semaphore)")
+    fun semaphore_only_one_success() {
+        onlyOneSuccess(SemaphoreStrategy(auctionService))
+    }
+
     /*
         1. executors.submit으로 제출된 태스크에서 발생하는 예외는 해당 스레드 내에서만 발생하고 메인 테스트 스레드로 자동 전파되지 않습니다.
         2. assertThrows는 같은 스레드에서 즉시 발생하는 예외만 감지할 수 있습니다.
