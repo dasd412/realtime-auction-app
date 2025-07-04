@@ -2,12 +2,14 @@ package com.auctionapp.com.auctionapp.expriment.concurrency
 
 import com.auctionapp.domain.service.AuctionService
 import com.auctionapp.expriment.concurrency.strategy.*
+import com.auctionapp.infrastructure.persistence.AuctionRepository
 import jakarta.annotation.PostConstruct
 import org.springframework.stereotype.Service
 
 @Service
 class ConcurrencyControlStrategyRegistry(
     private val auctionService: AuctionService,
+    private val auctionRepository: AuctionRepository,
 ) {
     private val strategies = mutableMapOf<String, ConcurrencyControlStrategy>()
     private var currentStrategy: String = "optimistic" // 기본값
@@ -15,11 +17,10 @@ class ConcurrencyControlStrategyRegistry(
     @PostConstruct
     fun init() {
         strategies["optimistic"] = OptimisticLockingStrategy(auctionService)
-        strategies["pessimistic"] = PessimisticLockingStrategy(auctionService)
+        strategies["pessimistic"] = PessimisticLockingStrategy(auctionService, auctionRepository)
         strategies["synchronized"] = SynchronizedStrategy(auctionService)
         strategies["tryLock"] = TryLockStrategy(auctionService)
         strategies["semaphore"] = SemaphoreStrategy(auctionService)
-        strategies["cas"] = AtomicCasStrategy(auctionService)
     }
 
     fun getCurrentStrategy(): ConcurrencyControlStrategy = strategies[currentStrategy]!!

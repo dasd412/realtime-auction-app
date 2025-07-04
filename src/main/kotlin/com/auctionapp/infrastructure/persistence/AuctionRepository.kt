@@ -78,5 +78,7 @@ interface AuctionRepository : JpaRepository<Auction, Long> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT a FROM Auction a WHERE a.id = :id")
-    fun findByIdWithPessimisticLock(@Param("id")id:Long):Auction?
+    fun findByIdWithPessimisticLock(
+        @Param("id")id: Long,
+    ): Auction?
 }
