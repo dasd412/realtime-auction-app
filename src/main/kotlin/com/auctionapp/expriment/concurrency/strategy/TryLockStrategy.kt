@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
 
+// 서버 인스턴스 수준에서의 락이므로 분산 서버 환경에서도 동시성 제어가 불가능
 class TryLockStrategy(
     private val auctionService: AuctionService,
 ) : ConcurrencyControlStrategy {
