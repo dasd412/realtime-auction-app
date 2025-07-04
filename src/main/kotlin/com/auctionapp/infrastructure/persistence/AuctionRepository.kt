@@ -4,9 +4,11 @@ import com.auctionapp.domain.entity.Auction
 import com.auctionapp.domain.entity.AuctionStatus
 import com.auctionapp.domain.entity.Product
 import com.auctionapp.domain.entity.User
+import jakarta.persistence.LockModeType
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Lock
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
@@ -73,4 +75,8 @@ interface AuctionRepository : JpaRepository<Auction, Long> {
         @Param("user") user: User,
         pageable: Pageable,
     ): Page<Auction>
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT a FROM Auction a WHERE a.id = :id")
+    fun findByIdWithPessimisticLock(@Param("id")id:Long):Auction?
 }
