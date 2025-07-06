@@ -21,6 +21,7 @@ import org.redisson.api.RedissonClient
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.transaction.PlatformTransactionManager
 import java.time.LocalDateTime
 
 class AuctionAppServiceTest {
@@ -31,6 +32,7 @@ class AuctionAppServiceTest {
     private val productRepository = mockk<ProductRepository>()
     private val strategyRegistry = mockk<ConcurrencyControlStrategyRegistry>()
     private val redissonClient = mockk<RedissonClient>()
+    private val transactionManger = mockk<PlatformTransactionManager>()
 
     private val auctionAppService =
         AuctionAppService(
@@ -41,6 +43,7 @@ class AuctionAppServiceTest {
             productRepository,
             strategyRegistry,
             redissonClient,
+            transactionManger,
         )
 
     @Test

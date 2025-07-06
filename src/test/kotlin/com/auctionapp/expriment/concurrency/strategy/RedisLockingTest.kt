@@ -68,7 +68,7 @@ class RedisLockingTest(
         assertThat(savedBid.user.id).isEqualTo(bidder.id)
     }
 
-    // @RepeatedTest(50)
+    // @RepeatedTest(70)
     @Test
     @DisplayName("Redis 분산 락 - 동시 입찰인 경우 최고 입찰가가 선택된다")
     fun concurrentBiddingWithRedisLock_success() {
@@ -130,5 +130,68 @@ class RedisLockingTest(
         val highestBidByAmount = bidRepository.findTopByAuctionOrderByAmountDesc(auction)
         assertThat(highestBidByAmount.amount.amount).isEqualTo(1000L + (threadCount * 100))
         println("최고 입찰액: ${highestBidByAmount.amount.amount}")
+    }
+
+    // @RepeatedTest(70)
+    @Test
+    @DisplayName("Redis 분산 락 - 같은 금액으로 동시 입찰 시 하나만 성공한다")
+    fun concurrentBiddingWithRedisLock_onlyOneSuccess() {
+        // given
+        val user = userRepository.save(User.fixture())
+        val product = productRepository.save(Product.fixture(user = user))
+        val auction =
+            auctionRepository.save(
+                Auction.fixture(
+                    initialPrice = Money(1000),
+                    product = product,
+                    user = user,
+                    status = AuctionStatus.ACTIVE,
+                ),
+            )
+
+        val threadCount = 10
+        val executorService = Executors.newFixedThreadPool(threadCount)
+        val countDownLatch = CountDownLatch(threadCount)
+        val successCount = AtomicInteger(0)
+        val failCount = AtomicInteger(0)
+        val testStartTime = System.currentTimeMillis()
+        val bidResults = Collections.synchronizedList(mutableListOf<Long>())
+
+        // when
+        for (i in 1..threadCount) {
+            val bidAmount = 1000L
+            val bidder = userRepository.save(User.fixture(id = i + 1100L))
+            executorService.submit {
+                try {
+                    auctionAppService.placeBidWithRedisLock(
+                        bidder.id!!,
+                        auction.id!!,
+                        bidAmount,
+                    )
+                    successCount.incrementAndGet()
+                    bidResults.add(bidAmount)
+                } catch (e: Exception) {
+                    failCount.incrementAndGet()
+                    println("실패: ${e.javaClass.simpleName} - ${e.message}")
+                } finally {
+                    countDownLatch.countDown()
+                }
+            }
+        }
+
+        countDownLatch.await(1000, TimeUnit.MILLISECONDS)
+        executorService.shutdown()
+
+        // then
+        println("Redis 분산 락 테스트 결과:")
+        println("성공 횟수: ${successCount.get()}")
+        println("실패 횟수: ${failCount.get()}")
+        println("총 소요 시간: ${System.currentTimeMillis() - testStartTime}ms")
+        println("처리 순서: $bidResults")
+        val highestBidByAmount = bidRepository.findTopByAuctionOrderByAmountDesc(auction)
+        assertThat(highestBidByAmount.amount.amount).isEqualTo(1000L)
+        println("최고 입찰액: ${highestBidByAmount.amount.amount}")
+        assertThat(successCount.get()).isEqualTo(1)
+        assertThat(failCount.get()).isEqualTo(threadCount - 1)
     }
 }

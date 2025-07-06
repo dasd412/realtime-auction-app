@@ -18,8 +18,10 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.transaction.support.TransactionTemplate
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 
@@ -42,6 +44,7 @@ class AuctionAppService(
     private val productRepository: ProductRepository,
     private val strategyRegistry: ConcurrencyControlStrategyRegistry,
     private val redissonClient: RedissonClient,
+    private val transactionManager: PlatformTransactionManager,
 ) {
     @Transactional
     fun registerAuction(
@@ -134,18 +137,14 @@ class AuctionAppService(
     // synchronized, tryLock, semaphore는 분산 서버에선 동시성 제어가 안되고
     // 비관적 락은 분산 DB에서 동시성 제어가 안되므로 레디스 분산 락을 활용함.
     // 분산락과 트랜잭션을 함께 사용할 경우, 락 획득 → 트랜잭션 시작 → 비즈니스 로직 → 트랜잭션 커밋 또는 롤백 → 락 해제 순서로 진행되야 함
-    @Transactional
     fun placeBidWithRedisLock(
         userId: Long,
         auctionId: Long,
         amount: Long,
     ): Long {
-        val user = userRepository.findByIdOrNull(userId) ?: throw NotFoundUserException()
-        val auction = auctionRepository.findByIdOrNull(auctionId) ?: throw NotFoundAuctionException()
-        val money = Money(amount)
-
         val lockKey = "auction:Lock:$auctionId"
         val lock = redissonClient.getLock(lockKey)
+        val transactionTemplate = TransactionTemplate(transactionManager)
 
         try {
             val isLockAcquired = lock.tryLock(REDIS_LOCK_WAIT_TIME_SECOND, REDIS_LOCK_LEASE_TIME_SECOND, TimeUnit.SECONDS)
@@ -155,11 +154,29 @@ class AuctionAppService(
             }
 
             // 트랜잭션 내에서 비즈니스 로직 실행
-            val savedBid = placeBidInTransaction(money, user, auction)
+            // @Transactional 어노테이션 대신 TransactionTemplate을 사용하는 이유:
+            // 1. 트랜잭션과 락의 생명주기 제어:
+            // - @Transactional은 메서드 시작 시 트랜잭션이 시작되고, 메서드 종료 시 커밋됩니다.
+            // - TransactionTemplate은 락 획득 후 명시적으로 트랜잭션을 시작하고 종료할 수 있습니다.
+            // 2. 프록시 기반 AOP의 한계:
+            // - @Transactional은 Spring AOP 프록시를 통해 작동하며 같은 클래스 내 호출 시 적용되지 않을 수 있습니다.
+            // - TransactionTemplate은 이러한 제약 없이 직접 트랜잭션을 관리합니다.
+            // 3. 락과 트랜잭션 순서 보장:
+            // - 분산 락에서는 '락 획득 → 트랜잭션 시작 → 비즈니스 로직 → 트랜잭션 커밋 → 락 해제' 순서가 중요합니다.
+            // - @Transactional에서는 트랜잭션이 먼저 시작되어 락 해제 시점이 잘못될 수 있습니다.
+            // 4. 예외 처리와 락 해제 보장:
+            // - TransactionTemplate에서는 예외 발생으로 롤백되더라도 finally 블록에서 락 해제가 보장됩니다.
+            // - @Transactional에서는 예외 시 트랜잭션 롤백과 락 해제 순서가 명확하지 않을 수 있습니다.
+            return transactionTemplate.execute {
+                val user = userRepository.findByIdOrNull(userId) ?: throw NotFoundUserException()
+                val auction = auctionRepository.findByIdOrNull(auctionId) ?: throw NotFoundAuctionException()
+                val money = Money(amount)
 
-            auction.addBidEvent(savedBid)
+                val savedBid = placeBidInTransaction(money, user, auction)
+                auction.addBidEvent(savedBid)
 
-            return savedBid.id!!
+                savedBid.id!!
+            }!!
         } finally {
             // 트랜잭션이 커밋 또는 롤백이 끝나면 레디스 분산 락을 해제
             if (lock.isHeldByCurrentThread) {
