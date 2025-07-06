@@ -70,6 +70,7 @@ dependencies {
     testImplementation("org.testcontainers:testcontainers:1.19.3")
     testImplementation("org.testcontainers:mysql:1.19.3")
     testImplementation("org.testcontainers:junit-jupiter:1.19.3")
+    testImplementation("it.ozimov:embedded-redis:0.7.3")
 
     // JOOQ 코드 생성을 위한 별도 의존성
     jooqGenerator("com.h2database:h2")
