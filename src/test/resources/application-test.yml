@@ -13,3 +13,6 @@ spring:
         init:
             schema-locations: classpath:schema-test.sql
             mode: always
+logging:
+    level:
+        org.redisson: DEBUG    # Redisson 전체 로그

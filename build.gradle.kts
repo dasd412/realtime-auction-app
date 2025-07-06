@@ -61,6 +61,13 @@ dependencies {
 
     // Logging
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
+    // 기존 slf4j-simple 의존성을 제외
+    implementation("org.slf4j:slf4j-api")
+
+    // slf4j-simple 의존성이 다른 의존성에 포함되어 있다면 제외 처리
+    configurations.all {
+        exclude(group = "org.slf4j", module = "slf4j-simple")
+    }
 
     // Test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
