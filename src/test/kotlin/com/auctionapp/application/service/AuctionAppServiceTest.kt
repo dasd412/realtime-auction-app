@@ -30,6 +30,7 @@ class AuctionAppServiceTest {
     private val userRepository = mockk<UserRepository>()
     private val productRepository = mockk<ProductRepository>()
     private val strategyRegistry = mockk<ConcurrencyControlStrategyRegistry>()
+    private val redissonClient = mockk<RedissonClient>()
 
     private val auctionAppService =
         AuctionAppService(
@@ -39,6 +40,7 @@ class AuctionAppServiceTest {
             userRepository,
             productRepository,
             strategyRegistry,
+            redissonClient,
         )
 
     @Test

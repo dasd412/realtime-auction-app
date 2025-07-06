@@ -8,6 +8,7 @@ import com.auctionapp.com.auctionapp.expriment.concurrency.ConcurrencyControlStr
 import com.auctionapp.domain.entity.Auction
 import com.auctionapp.domain.entity.AuctionStatus
 import com.auctionapp.domain.entity.Bid
+import com.auctionapp.domain.entity.User
 import com.auctionapp.domain.service.AuctionService
 import com.auctionapp.domain.vo.Money
 import com.auctionapp.expriment.concurrency.strategy.BidConflictException
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
@@ -27,9 +29,9 @@ enum class AuctionSortType {
     POPULARITY, // 인기순(입찰 수)
 }
 
-const val REDIS_LOCK_WAIT_TIME_SECOND = 3L    // 락 획득 시도 시간
-const val REDIS_LOCK_LEASE_TIME_SECOND = 5L   // 락 획득 성공 후 보유 시간
-const val TRANSACTION_TIMEOUT_SECOND = 3     // 트랜잭션 타임아웃, 트랜잭션 타임 아웃 <  락 획득 성공 후 보유 시간여야 함.
+const val REDIS_LOCK_WAIT_TIME_SECOND = 3L // 락 획득 시도 시간
+const val REDIS_LOCK_LEASE_TIME_SECOND = 5L // 락 획득 성공 후 보유 시간
+const val TRANSACTION_TIMEOUT_SECOND = 3 // 트랜잭션 타임아웃, 트랜잭션 타임 아웃 <  락 획득 성공 후 보유 시간여야 함.
 
 @Service
 class AuctionAppService(
@@ -132,13 +134,17 @@ class AuctionAppService(
     // synchronized, tryLock, semaphore는 분산 서버에선 동시성 제어가 안되고
     // 비관적 락은 분산 DB에서 동시성 제어가 안되므로 레디스 분산 락을 활용함.
     // 분산락과 트랜잭션을 함께 사용할 경우, 락 획득 → 트랜잭션 시작 → 비즈니스 로직 → 트랜잭션 커밋 또는 롤백 → 락 해제 순서로 진행되야 함
+    @Transactional
     fun placeBidWithRedisLock(
         userId: Long,
         auctionId: Long,
         amount: Long,
     ): Long {
-        val lockKey = "auction:Lock:$auctionId"
+        val user = userRepository.findByIdOrNull(userId) ?: throw NotFoundUserException()
+        val auction = auctionRepository.findByIdOrNull(auctionId) ?: throw NotFoundAuctionException()
+        val money = Money(amount)
 
+        val lockKey = "auction:Lock:$auctionId"
         val lock = redissonClient.getLock(lockKey)
 
         try {
@@ -149,7 +155,11 @@ class AuctionAppService(
             }
 
             // 트랜잭션 내에서 비즈니스 로직 실행
-            return placeBidInTransaction(userId, auctionId, amount)
+            val savedBid = placeBidInTransaction(money, user, auction)
+
+            auction.addBidEvent(savedBid)
+
+            return savedBid.id!!
         } finally {
             // 트랜잭션이 커밋 또는 롤백이 끝나면 레디스 분산 락을 해제
             if (lock.isHeldByCurrentThread) {
@@ -160,21 +170,16 @@ class AuctionAppService(
 
     // 반드시 트랜잭션이 끝나는게 확정되고 나서 레디스 분산 락을 해제해야 하므로
     // 트랜잭션의 타임 아웃을 레디스 분산 락 타임아웃보다 더 짧게 함.
-    @Transactional(timeout = TRANSACTION_TIMEOUT_SECOND)
+    @Transactional(propagation = Propagation.REQUIRES_NEW, timeout = TRANSACTION_TIMEOUT_SECOND)
     private fun placeBidInTransaction(
-        userId: Long,
-        auctionId: Long,
-        amount: Long,
-    ): Long {
-        val user = userRepository.findByIdOrNull(userId) ?: throw NotFoundUserException()
-        val auction = auctionRepository.findByIdOrNull(auctionId) ?: throw NotFoundAuctionException()
-        val money = Money(amount)
-
+        money: Money,
+        user: User,
+        auction: Auction,
+    ): Bid {
         val bid = auctionService.placeBid(money, user, auction)
         val savedBid = bidRepository.save(bid)
-        auction.addBidEvent(savedBid)
 
-        return savedBid.id!!
+        return savedBid
     }
 
     @Transactional(readOnly = true)

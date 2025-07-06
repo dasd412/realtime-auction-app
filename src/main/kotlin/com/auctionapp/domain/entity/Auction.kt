@@ -3,10 +3,10 @@ package com.auctionapp.domain.entity
 import com.auctionapp.domain.event.AuctionEndedEvent
 import com.auctionapp.domain.event.AuctionStartedEvent
 import com.auctionapp.domain.event.BidPlacedEvent
-import com.auctionapp.domain.event.DomainEvent
 import com.auctionapp.domain.exception.*
 import com.auctionapp.domain.vo.Money
 import jakarta.persistence.*
+import org.springframework.data.domain.AbstractAggregateRoot
 import java.time.LocalDateTime
 
 /*
@@ -78,10 +78,7 @@ class Auction(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
-) {
-    @Transient // 이 필드는 데이터베이스에 저장되지 않음. 도메인 이벤트는 일반적으로 영속성 계층과는 별개로 처리되는 일시적인 객체이기 때문.
-    private val domainEvents = mutableListOf<DomainEvent>()
-
+) : AbstractAggregateRoot<Auction>() {
     init {
         if (Money(1000L).isGreaterThan(initialPrice)) {
             throw InvalidInitialPriceException()
@@ -98,7 +95,7 @@ class Auction(
         if (status == AuctionStatus.NOT_STARTED) {
             status = AuctionStatus.ACTIVE
             if (id != null) {
-                domainEvents.add(AuctionStartedEvent(id))
+                registerEvent(AuctionStartedEvent(id))
             }
         } else {
             throw InvalidAuctionStatusChangeException()
@@ -115,7 +112,7 @@ class Auction(
             }
 
             if (id != null) {
-                domainEvents.add(AuctionEndedEvent(id, getHighestBidder()?.id))
+                registerEvent(AuctionEndedEvent(id, getHighestBidder()?.id))
             }
         } else {
             throw InvalidAuctionStatusChangeException()
@@ -136,16 +133,8 @@ class Auction(
 
     fun addBidEvent(bid: Bid) {
         if (id != null && bid.id != null) {
-            domainEvents.add(BidPlacedEvent(id, bid.id, bid.amount))
+            registerEvent(BidPlacedEvent(id, bid.id, bid.amount))
         }
-    }
-
-    fun getDomainEvents(): List<DomainEvent> {
-        return domainEvents
-    }
-
-    fun clearDomainEvents() {
-        domainEvents.clear()
     }
 
     // 최고 입찰가 조회
