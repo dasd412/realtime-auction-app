@@ -23,4 +23,6 @@ interface BidRepository : JpaRepository<Bid, Long> {
         @Param("user") user: User,
         pageable: Pageable,
     ): Page<Bid>
+
+    fun findTopByAuctionOrderByAmountDesc(auction: Auction): Bid
 }

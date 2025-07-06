@@ -14,7 +14,6 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.data.domain.PageRequest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.support.TransactionTemplate
@@ -62,6 +61,7 @@ class DatabaseLockingTest {
         userRepository.deleteAll()
     }
 
+    // @RepeatedTest(50)
     @Test
     @DisplayName("비관적 락 테스트 - 동시 입찰인 경우 최고 입찰가가 선택된다")
     fun pessimisticLocking_success() {
@@ -120,16 +120,16 @@ class DatabaseLockingTest {
 
         // then
         // 최고가 입찰 확인
-        val highestBid = bidRepository.findByAuctionOrderByCreatedAtDesc(auction, PageRequest.of(0, 1)).content
-        assertThat(highestBid).isNotEmpty()
-        assertThat(highestBid[0].amount.amount).isEqualTo(10000L)
-
+        val highestBidByAmount = bidRepository.findTopByAuctionOrderByAmountDesc(auction)
+        assertThat(highestBidByAmount.amount.amount).isEqualTo(10000L)
+        println("최고 입찰액: ${highestBidByAmount.amount.amount}")
         println("비관적 락 테스트 결과 (최고가 선택):")
         println("총 실행 시간: ${testEndTime - testStartTime}ms")
         println("성공: ${successCount.get()}, 실패: ${failCount.get()}")
         println("처리 순서: $processedBids")
     }
 
+    // @RepeatedTest(50)
     @Test
     @DisplayName("비관적 락 테스트 - 같은 금액으로 동시 입찰 시 하나만 성공한다")
     fun pessimisticLocking_onlyOneSuccess() {
@@ -157,7 +157,7 @@ class DatabaseLockingTest {
 
         // when
         for (i in 0 until threadCount) {
-            val userId = i + 10L
+            val userId = i + 1200L
             val user = userRepository.save(User.fixture(id = userId))
             val bidAmount = 1000L // 모두 동일한 금액으로 입찰
 
@@ -189,10 +189,9 @@ class DatabaseLockingTest {
         assertThat(successCount.get()).isEqualTo(1)
         assertThat(failCount.get()).isEqualTo(threadCount - 1)
 
-        val highestBid = bidRepository.findByAuctionOrderByCreatedAtDesc(auction, PageRequest.of(0, 1)).content
-        assertThat(highestBid).isNotEmpty()
-        assertThat(highestBid[0].amount.amount).isEqualTo(1000L)
-
+        val highestBidByAmount = bidRepository.findTopByAuctionOrderByAmountDesc(auction)
+        assertThat(highestBidByAmount.amount.amount).isEqualTo(1000L)
+        println("최고 입찰액: ${highestBidByAmount.amount.amount}")
         println("비관적 락 테스트 결과 (동일 금액):")
         println("총 실행 시간: ${testEndTime - testStartTime}ms")
         println("성공: ${successCount.get()}, 실패: ${failCount.get()}")

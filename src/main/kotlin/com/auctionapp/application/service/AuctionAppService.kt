@@ -11,9 +11,9 @@ import com.auctionapp.domain.entity.Bid
 import com.auctionapp.domain.entity.User
 import com.auctionapp.domain.service.AuctionService
 import com.auctionapp.domain.vo.Money
-import com.auctionapp.expriment.concurrency.strategy.BidConflictException
 import com.auctionapp.infrastructure.persistence.*
 import org.redisson.api.RedissonClient
+import org.redisson.client.RedisException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
@@ -151,7 +151,7 @@ class AuctionAppService(
             val isLockAcquired = lock.tryLock(REDIS_LOCK_WAIT_TIME_SECOND, REDIS_LOCK_LEASE_TIME_SECOND, TimeUnit.SECONDS)
 
             if (!isLockAcquired) {
-                throw BidConflictException()
+                throw RedisException("분산 락 획득에 실패했습니다")
             }
 
             // 트랜잭션 내에서 비즈니스 로직 실행

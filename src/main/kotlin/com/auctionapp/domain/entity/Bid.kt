@@ -18,20 +18,32 @@ class Bid(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 ) {
-    fun isValidBid(auction: Auction): Boolean {
+    fun validateBid(auction: Auction) {
         val highestBid = auction.getHighestBid()
 
-        if (auction.status != AuctionStatus.ACTIVE) { // 진행중이 아닌 거에는 입찰 불가
-            return false
+        if (auction.status != AuctionStatus.ACTIVE) {
+            throw InvalidBidException("경매가 진행 중이 아닙니다. 현재 상태: ${auction.status}")
         }
 
-        if (user.id == auction.user.id) { // 자신의 경매에는 입찰 불가
-            return false
+        if (user.id == auction.user.id) {
+            throw InvalidBidException("자신의 경매에는 입찰할 수 없습니다.")
         }
 
-        return when {
-            highestBid == null -> amount.isGreaterThanOrEqual(auction.initialPrice)
-            else -> amount.isGreaterThan(highestBid.amount.add(auction.minimumBidUnit))
+        when {
+            highestBid == null -> {
+                if (!amount.isGreaterThanOrEqual(auction.initialPrice)) {
+                    throw InvalidBidException("입찰가(${amount.amount})가 시작가(${auction.initialPrice.amount})보다 낮습니다.")
+                }
+            }
+            else -> {
+                val minimumAmount = highestBid.amount.add(auction.minimumBidUnit)
+                if (!amount.isGreaterThan(highestBid.amount)) {
+                    throw InvalidBidException("입찰가(${amount.amount})가 현재 최고가(${highestBid.amount.amount})보다 낮습니다.")
+                }
+                if (!amount.isGreaterThanOrEqual(minimumAmount)) {
+                    throw InvalidBidException("입찰가(${amount.amount})가 최소 입찰 단위(${auction.minimumBidUnit.amount})를 충족하지 않습니다. 최소 입찰액: ${minimumAmount.amount}")
+                }
+            }
         }
     }
 
@@ -55,8 +67,10 @@ class Bid(
         ): Bid {
             val bid = Bid(amount, LocalDateTime.now(), user, auction)
 
-            if (!bid.isValidBid(auction)) {
-                throw InvalidBidException()
+            try {
+                bid.validateBid(auction)
+            } catch (e: InvalidBidException) {
+                throw e // 이미 메시지가 포함된 예외를 그대로 전달
             }
 
             return bid
