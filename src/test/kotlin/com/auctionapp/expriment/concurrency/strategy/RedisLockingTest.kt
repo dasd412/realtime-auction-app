@@ -5,16 +5,16 @@ import com.auctionapp.domain.entity.*
 import com.auctionapp.domain.service.AuctionService
 import com.auctionapp.domain.vo.Money
 import com.auctionapp.infrastructure.persistence.AuctionRepository
+import com.auctionapp.infrastructure.persistence.ProductRepository
+import com.auctionapp.infrastructure.persistence.UserRepository
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Test
+import org.redisson.api.RedissonClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
-import org.junit.jupiter.api.Test
-import com.auctionapp.infrastructure.persistence.UserRepository
-import com.auctionapp.infrastructure.persistence.ProductRepository
-import org.assertj.core.api.Assertions.assertThat
-import org.redisson.api.RedissonClient
 import org.springframework.context.annotation.Import
+import org.springframework.test.context.ActiveProfiles
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -31,11 +31,10 @@ class RedisLockingTest(
     @Autowired
     private val redissonClient: RedissonClient,
 ) {
-
     @Test
     @DisplayName("분산 락을 통해 입찰이 성공적으로 처리된다.")
     fun shouldPlaceBidWithRedisLock() {
-    // given
+        // given
         val user = userRepository.save(User.fixture())
         val product = productRepository.save(Product.fixture(user = user, status = ProductStatus.AVAILABLE))
         val auction =
@@ -47,13 +46,13 @@ class RedisLockingTest(
                     status = AuctionStatus.ACTIVE,
                 ),
             )
-        val money=Money(2000)
-        val strategy=RedisDistributeLockStrategy(auctionService,redissonClient)
-        val user2=userRepository.save(User.fixture())
-        //when
-        val bid=strategy.placeBid(auction,user2, money)
+        val money = Money(2000)
+        val strategy = RedisDistributeLockStrategy(auctionService, redissonClient)
+        val user2 = userRepository.save(User.fixture())
+        // when
+        val bid = strategy.placeBid(auction, user2, money)
 
-        //then
+        // then
         assertThat(bid.amount).isEqualTo(money)
     }
 }

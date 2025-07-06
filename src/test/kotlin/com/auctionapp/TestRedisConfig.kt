@@ -10,7 +10,9 @@ import org.springframework.context.annotation.Bean
 @TestConfiguration
 class TestRedisConfig {
     @Bean
-    fun redissonClient(@Value("\${spring.redis.port:16379}") redisPort: Int): RedissonClient {
+    fun redissonClient(
+        @Value("\${spring.redis.port:16379}") redisPort: Int,
+    ): RedissonClient {
         val config = Config()
         config.useSingleServer()
             .setAddress("redis://localhost:$redisPort")
