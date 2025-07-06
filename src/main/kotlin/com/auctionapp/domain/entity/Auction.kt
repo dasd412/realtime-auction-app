@@ -75,8 +75,6 @@ class Auction(
     val product: Product,
     @OneToMany(mappedBy = "auction", cascade = [CascadeType.ALL], orphanRemoval = true)
     val bids: MutableList<Bid> = mutableListOf(),
-    @Version
-    var version: Long = 0,
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
