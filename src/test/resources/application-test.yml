@@ -1,6 +1,6 @@
 spring:
     datasource:
-        url: jdbc:h2:mem:testdb;NON_KEYWORDS=USER;DB_CLOSE_DELAY=-1
+        url: jdbc:h2:mem:testdb_${random.uuid};NON_KEYWORDS=USER;DB_CLOSE_DELAY=-1 # 테스트 격리를 위해 random uuid 사용
         username: sa
         password:
         driver-class-name: org.h2.Driver
