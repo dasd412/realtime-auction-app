@@ -33,7 +33,7 @@ server:
     context-path: /api
 
 jwt:
-  secret: your-secret-key-here-should-be-at-least-32-characters
+  secret: eW91ci1zZWNyZXQta2V5LWhlcmUtc2hvdWxkLWJlLWF0LWxlYXN0LTMyLWNoYXJhY3RlcnM=
   expiration: 86400000 # 24 hours in milliseconds
   refresh-expiration: 604800000 # 7 days in milliseconds
 
