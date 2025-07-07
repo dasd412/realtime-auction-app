@@ -2,7 +2,6 @@ package com.auctionapp.expriment.concurrency.strategy
 
 import com.auctionapp.TestRedisConfig
 import com.auctionapp.application.service.AuctionAppService
-import com.auctionapp.com.auctionapp.utils.SecurityUtil
 import com.auctionapp.domain.entity.*
 import com.auctionapp.domain.vo.Email
 import com.auctionapp.domain.vo.Money
@@ -10,10 +9,6 @@ import com.auctionapp.infrastructure.persistence.AuctionRepository
 import com.auctionapp.infrastructure.persistence.BidRepository
 import com.auctionapp.infrastructure.persistence.ProductRepository
 import com.auctionapp.infrastructure.persistence.UserRepository
-import io.mockk.clearAllMocks
-import io.mockk.every
-import io.mockk.mockkObject
-import io.mockk.mockkStatic
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
@@ -22,7 +17,6 @@ import org.springframework.context.annotation.Import
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.context.ActiveProfiles
 import java.util.*
 import java.util.concurrent.CountDownLatch
@@ -65,11 +59,12 @@ class RedisLockingTest(
             )
         val bidAmount = 2000L
         val bidder = userRepository.save(User.fixture(email = Email("test@example.com")))
-        val authentication = UsernamePasswordAuthenticationToken(
-            "test@example.com",
-            null,
-            listOf(SimpleGrantedAuthority("ROLE_CUSTOMER"))
-        )
+        val authentication =
+            UsernamePasswordAuthenticationToken(
+                "test@example.com",
+                null,
+                listOf(SimpleGrantedAuthority("ROLE_CUSTOMER")),
+            )
         SecurityContextHolder.getContext().authentication = authentication
 
         // when
@@ -82,7 +77,7 @@ class RedisLockingTest(
         assertThat(savedBid.user.id).isEqualTo(bidder.id)
     }
 
-    //@RepeatedTest(70)
+    // @RepeatedTest(70)
     @Test
     @DisplayName("Redis 분산 락 - 동시 입찰인 경우 최고 입찰가가 선택된다")
     fun concurrentBiddingWithRedisLock_success() {
@@ -110,15 +105,16 @@ class RedisLockingTest(
         // when
         for (i in 1..threadCount) {
             val bidAmount = 1000L + (i * 100)
-            userRepository.save(User.fixture(id = i + 1000L,email = Email("test_${i+1000L}@example.com"),))
+            userRepository.save(User.fixture(id = i + 1000L, email = Email("test_${i + 1000L}@example.com")))
 
             executorService.submit {
                 try {
-                    val authentication = UsernamePasswordAuthenticationToken(
-                        "test_${i+1000L}@example.com",
-                        null,
-                        listOf(SimpleGrantedAuthority("ROLE_CUSTOMER"))
-                    )
+                    val authentication =
+                        UsernamePasswordAuthenticationToken(
+                            "test_${i + 1000L}@example.com",
+                            null,
+                            listOf(SimpleGrantedAuthority("ROLE_CUSTOMER")),
+                        )
                     SecurityContextHolder.getContext().authentication = authentication
                     auctionAppService.placeBidWithRedisLock(
                         auction.id!!,
@@ -151,7 +147,7 @@ class RedisLockingTest(
         println("최고 입찰액: ${highestBidByAmount.amount.amount}")
     }
 
-    //@RepeatedTest(70)
+    // @RepeatedTest(70)
     @Test
     @DisplayName("Redis 분산 락 - 같은 금액으로 동시 입찰 시 하나만 성공한다")
     fun concurrentBiddingWithRedisLock_onlyOneSuccess() {
@@ -179,14 +175,15 @@ class RedisLockingTest(
         // when
         for (i in 1..threadCount) {
             val bidAmount = 1000L
-            userRepository.save(User.fixture(id = i + 1000L,email = Email("test_${i+1100L}@example.com"),))
+            userRepository.save(User.fixture(id = i + 1000L, email = Email("test_${i + 1100L}@example.com")))
             executorService.submit {
                 try {
-                    val authentication = UsernamePasswordAuthenticationToken(
-                        "test_${i+1100L}@example.com",
-                        null,
-                        listOf(SimpleGrantedAuthority("ROLE_CUSTOMER"))
-                    )
+                    val authentication =
+                        UsernamePasswordAuthenticationToken(
+                            "test_${i + 1100L}@example.com",
+                            null,
+                            listOf(SimpleGrantedAuthority("ROLE_CUSTOMER")),
+                        )
                     SecurityContextHolder.getContext().authentication = authentication
                     auctionAppService.placeBidWithRedisLock(
                         auction.id!!,
