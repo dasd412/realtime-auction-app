@@ -113,9 +113,7 @@ class AuctionAppService(
 
     @PreAuthorize("hasRole('CUSTOMER')")
     @Transactional
-    fun cancelAuction(
-        auctionId: Long,
-    ) {
+    fun cancelAuction(auctionId: Long) {
         val username = SecurityUtil.getCurrentUsername() ?: throw UnauthorizedException()
         val user = userRepository.findByEmail(Email(username)) ?: throw NotFoundUserException()
         val auction = auctionRepository.findByIdOrNull(auctionId) ?: throw NotFoundAuctionException()
@@ -224,9 +222,7 @@ class AuctionAppService(
 
     @PreAuthorize("hasRole('CUSTOMER')")
     @Transactional(readOnly = true)
-    fun getBidsOfUser(
-        pageNumber: Int,
-    ): Page<Bid> {
+    fun getBidsOfUser(pageNumber: Int): Page<Bid> {
         val username = SecurityUtil.getCurrentUsername() ?: throw UnauthorizedException()
         val user = userRepository.findByEmail(Email(username)) ?: throw NotFoundUserException()
         return bidRepository.findByUserOrderByCreatedAtDesc(user, PageRequest.of(pageNumber, DEFAULT_AUCTION_PAGE_SIZE))
@@ -234,9 +230,7 @@ class AuctionAppService(
 
     @PreAuthorize("hasRole('CUSTOMER')")
     @Transactional(readOnly = true)
-    fun getAuctionsOfAuctionOwner(
-        pageNumber: Int,
-    ): Page<Auction> {
+    fun getAuctionsOfAuctionOwner(pageNumber: Int): Page<Auction> {
         val username = SecurityUtil.getCurrentUsername() ?: throw UnauthorizedException()
         val user = userRepository.findByEmail(Email(username)) ?: throw NotFoundUserException()
         return auctionRepository.findByUser(user, PageRequest.of(pageNumber, DEFAULT_AUCTION_PAGE_SIZE))
@@ -244,9 +238,7 @@ class AuctionAppService(
 
     @PreAuthorize("hasRole('CUSTOMER')")
     @Transactional(readOnly = true)
-    fun getAuctionsOfBidder(
-        pageNumber: Int,
-    ): Page<Auction> {
+    fun getAuctionsOfBidder(pageNumber: Int): Page<Auction> {
         val username = SecurityUtil.getCurrentUsername() ?: throw UnauthorizedException()
         val user = userRepository.findByEmail(Email(username)) ?: throw NotFoundUserException()
         return auctionRepository.findByBidUser(user, PageRequest.of(pageNumber, DEFAULT_AUCTION_PAGE_SIZE))
