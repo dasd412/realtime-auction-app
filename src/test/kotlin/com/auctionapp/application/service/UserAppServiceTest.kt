@@ -32,12 +32,13 @@ class UserAppServiceTest {
     private val valueOperations = mockk<ValueOperations<String, String>>()
 
     // 테스트 대상 서비스
-    private val userAppService = UserAppService(
-        userRepository = userRepository,
-        passwordEncoder = passwordEncoder,
-        jwtTokenProvider = jwtTokenProvider,
-        redisTemplate = redisTemplate
-    )
+    private val userAppService =
+        UserAppService(
+            userRepository = userRepository,
+            passwordEncoder = passwordEncoder,
+            jwtTokenProvider = jwtTokenProvider,
+            redisTemplate = redisTemplate,
+        )
 
     @AfterEach
     fun tearDown() {
@@ -48,19 +49,21 @@ class UserAppServiceTest {
     @DisplayName("유효한 회원가입 요청이 성공적으로 처리된다")
     fun signup_validRequest_success() {
         // given
-        val request = SignupRequest(
-            email = "test@example.com",
-            password = "Test12345!",
-            name = "Test User"
-        )
+        val request =
+            SignupRequest(
+                email = "test@example.com",
+                password = "Test12345!",
+                name = "Test User",
+            )
         val encodedPassword = "Test12345!"
-        val savedUser = User(
-            id = 1L,
-            email = Email(request.email),
-            password = encodedPassword,
-            name = request.name,
-            role = Role.CUSTOMER
-        )
+        val savedUser =
+            User(
+                id = 1L,
+                email = Email(request.email),
+                password = encodedPassword,
+                name = request.name,
+                role = Role.CUSTOMER,
+            )
 
         every { userRepository.findByEmail(Email(request.email)) } returns null
         every { passwordEncoder.encode(request.password) } returns encodedPassword
@@ -80,11 +83,12 @@ class UserAppServiceTest {
     @DisplayName("이미 존재하는 이메일로 회원가입 시 예외가 발생한다")
     fun signup_duplicateEmail_throwsException() {
         // given
-        val request = SignupRequest(
-            email = "existing@example.com",
-            password = "Test12345!",
-            name = "Existing User"
-        )
+        val request =
+            SignupRequest(
+                email = "existing@example.com",
+                password = "Test12345!",
+                name = "Existing User",
+            )
         val existingUser = mockk<User>()
 
         every { userRepository.findByEmail(Email(request.email)) } returns existingUser
@@ -99,22 +103,23 @@ class UserAppServiceTest {
         verify(exactly = 0) { userRepository.save(any()) }
     }
 
-
     @Test
     @DisplayName("유효한 로그인 정보로 로그인이 성공한다")
     fun login_validCredentials_success() {
         // given
-        val request = LoginRequest(
-            email = "test@example.com",
-            password = "Test12345!",
-        )
-        val user = User(
-            id = 1L,
-            email = Email(request.email),
-            password = "Test12345!",
-            name = "Test User",
-            role = Role.CUSTOMER
-        )
+        val request =
+            LoginRequest(
+                email = "test@example.com",
+                password = "Test12345!",
+            )
+        val user =
+            User(
+                id = 1L,
+                email = Email(request.email),
+                password = "Test12345!",
+                name = "Test User",
+                role = Role.CUSTOMER,
+            )
         val accessToken = "access-token"
         val refreshToken = "refresh-token"
         val tokenResponse = TokenResponse(accessToken, refreshToken)
@@ -139,10 +144,11 @@ class UserAppServiceTest {
     @DisplayName("존재하지 않는 이메일로 로그인 시 예외가 발생한다")
     fun login_nonExistentEmail_throwsException() {
         // given
-        val request = LoginRequest(
-            email = "nonexistent@example.com",
-            password = "Test12345!",
-        )
+        val request =
+            LoginRequest(
+                email = "nonexistent@example.com",
+                password = "Test12345!",
+            )
 
         every { userRepository.findByEmail(Email(request.email)) } returns null
 
@@ -161,17 +167,19 @@ class UserAppServiceTest {
     @DisplayName("잘못된 비밀번호로 로그인 시 예외가 발생한다")
     fun login_invalidPassword_throwsException() {
         // given
-        val request = LoginRequest(
-            email = "test@example.com",
-            password = "wrongPassword12345!"
-        )
-        val user = User(
-            id = 1L,
-            email = Email(request.email),
-            password = "Test12345!",
-            name = "Test User",
-            role = Role.CUSTOMER
-        )
+        val request =
+            LoginRequest(
+                email = "test@example.com",
+                password = "wrongPassword12345!",
+            )
+        val user =
+            User(
+                id = 1L,
+                email = Email(request.email),
+                password = "Test12345!",
+                name = "Test User",
+                role = Role.CUSTOMER,
+            )
 
         every { userRepository.findByEmail(Email(request.email)) } returns user
         every { passwordEncoder.matches(request.password, user.password) } returns false
@@ -187,20 +195,20 @@ class UserAppServiceTest {
         verify(exactly = 0) { jwtTokenProvider.createRefreshToken(any()) }
     }
 
-
     @Test
     @DisplayName("유효한 리프레시 토큰으로 액세스 토큰이 갱신된다")
     fun refreshToken_validRefreshToken_success() {
         // given
         val refreshToken = "valid-refresh-token"
         val email = "test@example.com"
-        val user = User(
-            id = 1L,
-            email = Email(email),
-            password = "Test12345!",
-            name = "Test User",
-            role = Role.CUSTOMER
-        )
+        val user =
+            User(
+                id = 1L,
+                email = Email(email),
+                password = "Test12345!",
+                name = "Test User",
+                role = Role.CUSTOMER,
+            )
         val newAccessToken = "new-access-token"
 
         every { jwtTokenProvider.validateToken(refreshToken) } returns true
@@ -291,7 +299,6 @@ class UserAppServiceTest {
         verify(exactly = 0) { userRepository.findByEmail(any()) }
     }
 
-
     @Test
     @DisplayName("유효한 액세스 토큰으로 로그아웃이 성공한다")
     fun logout_validAccessToken_success() {
@@ -308,8 +315,8 @@ class UserAppServiceTest {
             valueOperations.set(
                 "BL:$accessToken",
                 "logout",
-                any<Long>(),  // 시간 값은 정확히 일치하지 않아도 됨
-                any()
+                any<Long>(),
+                any(),
             )
         } returns Unit
         every { redisTemplate.delete("RT:$email") } returns true
