@@ -5,6 +5,7 @@ import com.auctionapp.infrastructure.security.JwtTokenProvider
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.redis.core.RedisTemplate
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
@@ -15,6 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity // 메서드 수준 인가 설정
 class SecurityConfig(
     private val jwtTokenProvider: JwtTokenProvider,
     private val redisTemplate: RedisTemplate<String, String>,
@@ -28,7 +30,7 @@ class SecurityConfig(
                 it.requestMatchers("/", "/index.html", "/static/**").permitAll()
                     .requestMatchers("/h2-console/**").permitAll()
                     .requestMatchers("/auth/login", "/auth/signup").permitAll()
-                    .requestMatchers("/admin/**").hasRole("ADMIN")
+                    .requestMatchers("**/admin/**").hasRole("ADMIN")
                     .anyRequest().authenticated()
             }
             .addFilterBefore(

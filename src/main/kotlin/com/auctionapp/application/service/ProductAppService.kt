@@ -1,18 +1,18 @@
 package com.auctionapp.application.service
 
 import com.auctionapp.application.constant.DEFAULT_PRODUCT_PAGE_SIZE
-import com.auctionapp.application.exception.NotFoundProductException
-import com.auctionapp.application.exception.NotFoundUserException
-import com.auctionapp.application.exception.NotProductOwnerException
-import com.auctionapp.application.exception.UnavailableMethodInAuctionException
+import com.auctionapp.application.exception.*
+import com.auctionapp.com.auctionapp.utils.SecurityUtil
 import com.auctionapp.domain.entity.Product
 import com.auctionapp.domain.service.ProductService
+import com.auctionapp.domain.vo.Email
 import com.auctionapp.infrastructure.persistence.AuctionRepository
 import com.auctionapp.infrastructure.persistence.ProductRepository
 import com.auctionapp.infrastructure.persistence.UserRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -23,14 +23,16 @@ class ProductAppService(
     private val productRepository: ProductRepository,
     private val auctionRepository: AuctionRepository,
 ) {
+    @PreAuthorize("hasRole('CUSTOMER')")
     @Transactional
     fun registerProduct(
-        userId: Long,
         name: String,
         description: String?,
         imageUrl: String,
     ): Long {
-        val foundUser = userRepository.findByIdOrNull(userId) ?: throw NotFoundUserException()
+        val username = SecurityUtil.getCurrentUsername() ?: throw UnauthorizedException()
+
+        val foundUser = userRepository.findByEmail(Email(username)) ?: throw NotFoundUserException()
 
         val product = Product(name = name, description = description, imageUrl = imageUrl, user = foundUser)
         productService.registerProduct(product, foundUser)
@@ -54,9 +56,12 @@ class ProductAppService(
         }
     }
 
+    @PreAuthorize("hasRole('CUSTOMER')")
     @Transactional(readOnly = true)
-    fun getProductListByUserId(userId: Long): List<Product> {
-        return productRepository.findByUserId(userId)
+    fun getProductListByUserId(): List<Product> {
+        val username = SecurityUtil.getCurrentUsername() ?: throw UnauthorizedException()
+        val user = userRepository.findByEmail(Email(username)) ?: throw NotFoundUserException()
+        return productRepository.findByUserId(user.id!!)
     }
 
     @Transactional(readOnly = true)
@@ -65,17 +70,21 @@ class ProductAppService(
         return found
     }
 
+    @PreAuthorize("hasRole('CUSTOMER')")
     @Transactional
     fun updateProduct(
-        userId: Long,
         productId: Long,
         name: String,
         description: String?,
         imageUrl: String,
     ) {
+        val username = SecurityUtil.getCurrentUsername() ?: throw UnauthorizedException()
+
+        val user = userRepository.findByEmail(Email(username)) ?: throw NotFoundUserException()
+
         val found = productRepository.findByIdOrNull(productId) ?: throw NotFoundProductException()
 
-        if (found.user.id != userId) {
+        if (found.user.id != user.id) {
             throw NotProductOwnerException()
         }
 
@@ -90,14 +99,16 @@ class ProductAppService(
         found.imageUrl = imageUrl
     }
 
+    @PreAuthorize("hasRole('CUSTOMER')")
     @Transactional
-    fun deleteProduct(
-        userId: Long,
-        productId: Long,
-    ) {
+    fun deleteProduct(productId: Long) {
+        val username = SecurityUtil.getCurrentUsername() ?: throw UnauthorizedException()
+
+        val user = userRepository.findByEmail(Email(username)) ?: throw NotFoundUserException()
+
         val found = productRepository.findByIdOrNull(productId) ?: throw NotFoundProductException()
 
-        if (found.user.id != userId) {
+        if (found.user.id != user.id) {
             throw NotProductOwnerException()
         }
 

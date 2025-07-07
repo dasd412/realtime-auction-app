@@ -20,7 +20,7 @@ class UserController(
     @PostMapping("signup")
     fun signup(
         @Valid @RequestBody request: SignupRequest,
-    ): ResponseEntity<*>  {
+    ): ResponseEntity<*> {
         val userId = userAppService.signup(request)
         return ResponseEntity.ok(mapOf("userId" to userId, "message" to "회원가입이 성공적으로 완료되었습니다."))
     }

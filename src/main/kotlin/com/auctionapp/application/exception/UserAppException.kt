@@ -11,3 +11,5 @@ class NotFoundUserException(message: String = "존재 하지 않는 사용자입
 class UnavailableRefreshTokenException(message: String = "유효하지 않은 리프레시 토큰입니다") : UserAppException(message)
 
 class LogoutFailException(message: String = "로그아웃에 실패했습니다") : UserAppException(message)
+
+class UnauthorizedException(message: String = "접근 권한이 없습니다") : UserAppException(message)

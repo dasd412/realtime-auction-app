@@ -1,23 +1,23 @@
 package com.auctionapp.application.service
 
+import com.auctionapp.application.dto.LoginRequest
+import com.auctionapp.application.dto.SignupRequest
+import com.auctionapp.application.dto.TokenResponse
 import com.auctionapp.application.exception.DuplicateEmailException
 import com.auctionapp.application.exception.LoginFailException
+import com.auctionapp.application.exception.LogoutFailException
+import com.auctionapp.application.exception.UnavailableRefreshTokenException
 import com.auctionapp.domain.entity.Role
 import com.auctionapp.domain.entity.User
 import com.auctionapp.domain.vo.Email
 import com.auctionapp.infrastructure.persistence.UserRepository
-import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
-import org.springframework.security.crypto.password.PasswordEncoder
-import org.springframework.data.redis.core.RedisTemplate
-import com.auctionapp.application.dto.SignupRequest
-import com.auctionapp.application.dto.LoginRequest
-import com.auctionapp.application.dto.TokenResponse
-import com.auctionapp.application.exception.LogoutFailException
-import com.auctionapp.application.exception.UnavailableRefreshTokenException
 import com.auctionapp.infrastructure.security.JwtTokenProvider
+import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -29,29 +29,26 @@ class UserAppService(
     private val redisTemplate: RedisTemplate<String, String>,
 ) {
     @Transactional
-    fun signup(
-        request: SignupRequest,
-    ): Long {
+    fun signup(request: SignupRequest): Long {
         val found = userRepository.findByEmail(Email(request.email))
 
         if (found != null) {
             throw DuplicateEmailException()
         }
 
-        val user = User(
-            email = Email(request.email),
-            password = passwordEncoder.encode(request.password),
-            name = request.name,
-            role = Role.CUSTOMER
-        )
+        val user =
+            User(
+                email = Email(request.email),
+                password = passwordEncoder.encode(request.password),
+                name = request.name,
+                role = Role.CUSTOMER,
+            )
 
         return userRepository.save(user).id!!
     }
 
     @Transactional(readOnly = true)
-    fun login(
-        request: LoginRequest,
-    ): TokenResponse {
+    fun login(request: LoginRequest): TokenResponse {
         val user = userRepository.findByEmail(Email(request.email)) ?: throw LoginFailException()
 
         if (!passwordEncoder.matches(request.password, user.password)) {
@@ -90,7 +87,6 @@ class UserAppService(
         return TokenResponse(newAccessToken, refreshToken)
     }
 
-
     fun logout(accessToken: String) {
         if (!jwtTokenProvider.validateToken(accessToken)) {
             throw LogoutFailException()
@@ -101,7 +97,7 @@ class UserAppService(
         val expiration = jwtTokenProvider.getExpirationFromToken(accessToken)
         val timeToLive = expiration.time - Date().time
 
-        //access token을 블랙 리스트에 추가
+        // access token을 블랙 리스트에 추가
         redisTemplate.opsForValue().set(
             "BL:$accessToken",
             "logout",
@@ -109,7 +105,7 @@ class UserAppService(
             TimeUnit.MILLISECONDS,
         )
 
-        //리프레시 토큰 제거
+        // 리프레시 토큰 제거
         redisTemplate.delete("RT:$username")
     }
 }

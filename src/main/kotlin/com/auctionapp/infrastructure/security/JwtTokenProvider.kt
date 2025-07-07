@@ -30,7 +30,7 @@ class JwtTokenProvider(
         val validity = Date(now.time + accessTokenValidityMs)
 
         return Jwts.builder()
-            .setSubject(authentication.name)// 이메일을 subject로 넣고 있습니다
+            .setSubject(authentication.name) // 이메일을 subject로 넣고 있습니다
             .claim("authorities", authentication.authorities.joinToString(",") { it.authority })
             .setIssuedAt(now)
             .setExpiration(validity)
