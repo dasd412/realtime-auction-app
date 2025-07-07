@@ -58,7 +58,7 @@ class ProductAppService(
 
     @PreAuthorize("hasRole('CUSTOMER')")
     @Transactional(readOnly = true)
-    fun getProductListByUserId(): List<Product> {
+    fun getProductListOfUser(): List<Product> {
         val username = SecurityUtil.getCurrentUsername() ?: throw UnauthorizedException()
         val user = userRepository.findByEmail(Email(username)) ?: throw NotFoundUserException()
         return productRepository.findByUserId(user.id!!)
