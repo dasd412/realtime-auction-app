@@ -4,6 +4,7 @@ import com.auctionapp.application.constant.DEFAULT_AUCTION_PAGE_SIZE
 import com.auctionapp.application.exception.NotFoundAuctionException
 import com.auctionapp.application.exception.NotFoundProductException
 import com.auctionapp.application.exception.NotFoundUserException
+import com.auctionapp.application.exception.UnauthorizedException
 import com.auctionapp.com.auctionapp.expriment.concurrency.ConcurrencyControlStrategyRegistry
 import com.auctionapp.com.auctionapp.utils.SecurityUtil
 import com.auctionapp.domain.entity.*
@@ -51,6 +52,107 @@ class AuctionAppServiceTest {
     @AfterEach
     fun tearDown() {
         clearAllMocks()
+    }
+
+    @Test
+    @DisplayName("인증되지 않은 사용자가 경매 등록을 시도할 경우 예외가 발생한다")
+    fun registerAuction_unauthorizedUser() {
+        // given
+        val productId = 1L
+        val initialPrice = 1000L
+        val minimumBidUnit = 100L
+        val startTime = LocalDateTime.now()
+        val endTime = startTime.plusHours(1)
+        every { SecurityUtil.getCurrentUsername() } returns null
+
+        // when, then
+        assertThrows<UnauthorizedException> {
+            auctionAppService.registerAuction(productId, initialPrice, minimumBidUnit, startTime, endTime)
+        }
+
+        verify(exactly = 1) { SecurityUtil.getCurrentUsername() }
+        verify(exactly = 0) { userRepository.findByEmail(any()) }
+    }
+
+    @Test
+    @DisplayName("인증되지 않은 사용자가 경매 취소를 시도할 경우 예외가 발생한다")
+    fun cancelAuction_unauthorizedUser() {
+        // given
+        val auctionId = 1L
+        every { SecurityUtil.getCurrentUsername() } returns null
+
+        // when, then
+        assertThrows<UnauthorizedException> {
+            auctionAppService.cancelAuction(auctionId)
+        }
+
+        verify(exactly = 1) { SecurityUtil.getCurrentUsername() }
+        verify(exactly = 0) { userRepository.findByEmail(any()) }
+    }
+
+    @Test
+    @DisplayName("인증되지 않은 사용자가 입찰을 시도할 경우 예외가 발생한다")
+    fun placeBid_unauthorizedUser() {
+        // given
+        val auctionId = 1L
+        val amount = 1000L
+        every { SecurityUtil.getCurrentUsername() } returns null
+
+        // when, then
+        assertThrows<UnauthorizedException> {
+            auctionAppService.placeBid(auctionId, amount)
+        }
+
+        verify(exactly = 1) { SecurityUtil.getCurrentUsername() }
+        verify(exactly = 0) { userRepository.findByEmail(any()) }
+    }
+
+    @Test
+    @DisplayName("인증되지 않은 사용자가 자신의 입찰 목록을 조회할 경우 예외가 발생한다")
+    fun getBidsOfUser_unauthorizedUser() {
+        // given
+        val pageNumber = 0
+        every { SecurityUtil.getCurrentUsername() } returns null
+
+        // when, then
+        assertThrows<UnauthorizedException> {
+            auctionAppService.getBidsOfUser(pageNumber)
+        }
+
+        verify(exactly = 1) { SecurityUtil.getCurrentUsername() }
+        verify(exactly = 0) { userRepository.findByEmail(any()) }
+    }
+
+    @Test
+    @DisplayName("인증되지 않은 사용자가 자신이 등록한 경매 목록을 조회할 경우 예외가 발생한다")
+    fun getAuctionsOfAuctionOwner_unauthorizedUser() {
+        // given
+        val pageNumber = 0
+        every { SecurityUtil.getCurrentUsername() } returns null
+
+        // when, then
+        assertThrows<UnauthorizedException> {
+            auctionAppService.getAuctionsOfAuctionOwner(pageNumber)
+        }
+
+        verify(exactly = 1) { SecurityUtil.getCurrentUsername() }
+        verify(exactly = 0) { userRepository.findByEmail(any()) }
+    }
+
+    @Test
+    @DisplayName("인증되지 않은 사용자가 자신이 참여한 경매 목록을 조회할 경우 예외가 발생한다")
+    fun getAuctionsOfBidder_unauthorizedUser() {
+        // given
+        val pageNumber = 0
+        every { SecurityUtil.getCurrentUsername() } returns null
+
+        // when, then
+        assertThrows<UnauthorizedException> {
+            auctionAppService.getAuctionsOfBidder(pageNumber)
+        }
+
+        verify(exactly = 1) { SecurityUtil.getCurrentUsername() }
+        verify(exactly = 0) { userRepository.findByEmail(any()) }
     }
 
     @Test
