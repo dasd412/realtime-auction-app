@@ -40,22 +40,4 @@ class UserRepositoryTest
             assertThat(foundUser).isNotNull
             assertThat(foundUser?.email?.value).isEqualTo("test@test.com")
         }
-
-        @Test
-        @DisplayName("이메일과 비밀번호로 조회한다")
-        fun findByEmailAndPasswordTest() {
-            // given
-            val email = Email(value = "test@test.com")
-            val password = "Test123456!"
-            val user = User(email, password, "test", Role.CUSTOMER)
-            userRepository.save(user)
-
-            // when
-            val foundUser = userRepository.findByEmailAndPassword(email, password)
-
-            // then
-            assertThat(foundUser).isNotNull
-            assertThat(foundUser?.email?.value).isEqualTo("test@test.com")
-            assertThat(foundUser?.password).isEqualTo(password)
-        }
     }

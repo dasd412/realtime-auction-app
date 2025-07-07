@@ -23,18 +23,14 @@ class JwtTokenProvider(
     @Value("\${jwt.refresh-expiration}")private val refreshTokenValidityMs: Long,
     private val redisTemplate: RedisTemplate<String, String>,
 ) {
-    private val key: SecretKey
-
-    init {
-        key = Keys.hmacShaKeyFor(secretKey.toByteArray(StandardCharsets.UTF_8))
-    }
+    private final val key: SecretKey = Keys.hmacShaKeyFor(secretKey.toByteArray(StandardCharsets.UTF_8))
 
     fun createAccessToken(authentication: Authentication): String {
         val now = Date()
         val validity = Date(now.time + accessTokenValidityMs)
 
         return Jwts.builder()
-            .setSubject(authentication.name)
+            .setSubject(authentication.name)// 이메일을 subject로 넣고 있습니다
             .claim("authorities", authentication.authorities.joinToString(",") { it.authority })
             .setIssuedAt(now)
             .setExpiration(validity)
@@ -90,7 +86,7 @@ class JwtTokenProvider(
     }
 
     fun getUsernameFromToken(token: String): String {
-        return getClaims(token).subject
+        return getClaims(token).subject // 여기서 반환되는 값은 이메일입니다
     }
 
     fun getExpirationFromToken(token: String): Date {
@@ -101,7 +97,7 @@ class JwtTokenProvider(
         return Jwts.parserBuilder()
             .setSigningKey(key)
             .build()
-            .parseClaimsJwt(token)
+            .parseClaimsJws(token)
             .body
     }
 }

@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController
 class UserController(
     private val userAppService: UserAppService,
 ) {
-
     @PostMapping("signup")
     fun signup(
         @Valid @RequestBody request: SignupRequest,
@@ -39,7 +38,7 @@ class UserController(
         @RequestHeader("Authorization") refreshToken: String,
     ): ResponseEntity<TokenResponse> {
         val token = refreshToken.replace("Bearer ", "")
-        val tokenResponse = userService.refreshToken(token)
+        val tokenResponse = userAppService.refreshToken(token)
         return ResponseEntity.ok(tokenResponse)
     }
 
@@ -48,7 +47,7 @@ class UserController(
         @RequestHeader("Authorization") accessToken: String,
     ): ResponseEntity<*> {
         val token = accessToken.replace("Bearer ", "")
-        userService.logout(token)
+        userAppService.logout(token)
         return ResponseEntity.ok(mapOf("message" to "로그아웃 되었습니다."))
     }
 }
