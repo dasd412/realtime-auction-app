@@ -1,8 +1,3 @@
----
-description:
-globs:
-alwaysApply: true
----
 # 실시간 경매 플랫폼 주요 파일 참조
 
 ## 도메인 레이어
@@ -111,4 +106,4 @@ alwaysApply: true
 - [application.yml](mdc:src/main/resources/application.yml): 애플리케이션 설정
 - [application-test.yml](mdc:src/test/resources/application-test.yml): 테스트 환경 설정
 - [build.gradle.kts](mdc:build.gradle.kts): 빌드 설정
-- [docker-compose.yml](mdc:docker-compose.yml): 도커 컴포즈 설정
+- [docker-compose.yml](mdc:docker-compose.yml): 도커 컴포즈 설정 
