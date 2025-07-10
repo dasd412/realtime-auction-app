@@ -2,7 +2,9 @@ package com.auctionapp.application.controller
 
 import com.auctionapp.application.dto.request.LoginRequest
 import com.auctionapp.application.dto.request.SignupRequest
-import com.auctionapp.application.dto.response.AuthResponse
+import com.auctionapp.application.dto.response.LogoutResponse
+import com.auctionapp.application.dto.response.SignupResponse
+import com.auctionapp.application.dto.response.TokenResponse
 import com.auctionapp.application.service.AuthAppService
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
@@ -20,15 +22,15 @@ class AuthController(
     @PostMapping("signup")
     fun signup(
         @Valid @RequestBody request: SignupRequest,
-    ): ResponseEntity<*> {
+    ): ResponseEntity<SignupResponse> {
         val userId = authAppService.signup(request)
-        return ResponseEntity.ok(mapOf("userId" to userId, "message" to "회원가입이 성공적으로 완료되었습니다."))
+        return ResponseEntity.ok(SignupResponse(userId))
     }
 
     @PostMapping("/login")
     fun login(
         @Valid @RequestBody request: LoginRequest,
-    ): ResponseEntity<AuthResponse> {
+    ): ResponseEntity<TokenResponse> {
         val tokenResponse = authAppService.login(request)
         return ResponseEntity.ok(tokenResponse)
     }
@@ -36,7 +38,7 @@ class AuthController(
     @PostMapping("/refresh")
     fun refreshToken(
         @RequestHeader("Authorization") refreshToken: String,
-    ): ResponseEntity<AuthResponse> {
+    ): ResponseEntity<TokenResponse> {
         val token = refreshToken.replace("Bearer ", "")
         val tokenResponse = authAppService.refreshToken(token)
         return ResponseEntity.ok(tokenResponse)
@@ -45,9 +47,9 @@ class AuthController(
     @PostMapping("/logout")
     fun logout(
         @RequestHeader("Authorization") accessToken: String,
-    ): ResponseEntity<*> {
+    ): ResponseEntity<LogoutResponse> {
         val token = accessToken.replace("Bearer ", "")
         authAppService.logout(token)
-        return ResponseEntity.ok(mapOf("message" to "로그아웃 되었습니다."))
+        return ResponseEntity.ok(LogoutResponse(token))
     }
 }

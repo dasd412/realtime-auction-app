@@ -1,5 +1,6 @@
 import com.auctionapp.application.dto.request.RegisterProductRequest
 import com.auctionapp.application.dto.request.UpdateProductRequest
+import com.auctionapp.application.dto.response.*
 import com.auctionapp.application.service.ProductAppService
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
@@ -13,7 +14,7 @@ class ProductController(
     @PostMapping
     fun registerProduct(
         @Valid @RequestBody request: RegisterProductRequest,
-    ): ResponseEntity<Map<String, Long>> {
+    ): ResponseEntity<ProductRegisterResponse> {
         val productId =
             productAppService.registerProduct(
                 name = request.name,
@@ -21,30 +22,35 @@ class ProductController(
                 imageUrl = request.imageUrl,
             )
 
-        return ResponseEntity.ok(mapOf("productId" to productId))
+        return ResponseEntity.ok(ProductRegisterResponse(productId))
     }
 
-    // 상품 목록 조회
     @GetMapping
     fun getProductList(
         @RequestParam(required = false) name: String?,
         @RequestParam(defaultValue = "0") pageNumber: Int,
-    ) = productAppService.getProductList(name, pageNumber)
+    ): ResponseEntity<ProductListResponse>{
+        return ResponseEntity.ok(productAppService.getProductList(name, pageNumber).toListResponse())
+    }
 
     // 내 상품 목록 조회
     @GetMapping("/my-products")
-    fun getMyProducts() = productAppService.getProductListOfUser()
+    fun getMyProducts() : ResponseEntity<List<ProductDetailResponse>> {
+        return ResponseEntity.ok(productAppService.getProductListOfUser().map { it.toDetailResponse() })
+    }
 
     @GetMapping("/{productId}")
     fun getProductDetail(
         @PathVariable productId: Long,
-    ) = productAppService.getProductDetail(productId)
+    ) : ResponseEntity<ProductDetailResponse> {
+        return ResponseEntity.ok(productAppService.getProductDetail(productId).toDetailResponse())
+    }
 
     @PutMapping("/{productId}")
     fun updateProduct(
         @PathVariable productId: Long,
         @Valid @RequestBody request: UpdateProductRequest,
-    ): ResponseEntity<Map<String, String>> {
+    ): ResponseEntity<ProductUpdateResponse> {
         productAppService.updateProduct(
             productId = productId,
             name = request.name,
@@ -52,14 +58,14 @@ class ProductController(
             imageUrl = request.imageUrl,
         )
 
-        return ResponseEntity.ok(mapOf("message" to "상품이 수정되었습니다."))
+        return ResponseEntity.ok(ProductUpdateResponse(productId))
     }
 
     @DeleteMapping("/{productId}")
     fun deleteProduct(
         @PathVariable productId: Long,
-    ): ResponseEntity<Map<String, String>> {
+    ): ResponseEntity<ProductDeleteResponse> {
         productAppService.deleteProduct(productId)
-        return ResponseEntity.ok(mapOf("message" to "상품이 삭제되었습니다."))
+        return ResponseEntity.ok(ProductDeleteResponse(productId))
     }
 }

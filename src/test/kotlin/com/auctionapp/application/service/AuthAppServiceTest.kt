@@ -2,7 +2,7 @@ package com.auctionapp.application.service
 
 import com.auctionapp.application.dto.request.LoginRequest
 import com.auctionapp.application.dto.request.SignupRequest
-import com.auctionapp.application.dto.response.AuthResponse
+import com.auctionapp.application.dto.response.TokenResponse
 import com.auctionapp.application.exception.DuplicateEmailException
 import com.auctionapp.application.exception.LoginFailException
 import com.auctionapp.application.exception.LogoutFailException
@@ -122,7 +122,7 @@ class AuthAppServiceTest {
             )
         val accessToken = "access-token"
         val refreshToken = "refresh-token"
-        val tokenResponse = AuthResponse(accessToken, refreshToken)
+        val tokenResponse = TokenResponse(accessToken, refreshToken)
 
         every { userRepository.findByEmail(Email(request.email)) } returns user
         every { passwordEncoder.matches(request.password, user.password) } returns true
