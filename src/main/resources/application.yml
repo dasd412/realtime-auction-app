@@ -45,11 +45,12 @@ logging:
     org.jooq: DEBUG
 
 auction:
-  bidding:
-    min-increment: 1000
-  concurrency:
-    strategy: optimistic # 기본값은 낙관적 락 사용
   websocket:
     endpoint: /ws
     destination-prefix: /topic
     application-prefix: /app
+
+app:
+  security:
+    dev-mode: true
+    extended-token-expiry: true  # 개발 환경에서 토큰 유효 기간 연장 (예: 1일)
