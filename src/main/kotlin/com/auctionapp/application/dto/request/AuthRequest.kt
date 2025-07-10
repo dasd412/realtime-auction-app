@@ -1,5 +1,4 @@
-package com.auctionapp.application.dto
-
+package com.auctionapp.application.dto.request
 import com.auctionapp.domain.entity.Role
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
@@ -25,10 +24,4 @@ data class LoginRequest(
     val email: String,
     @field:NotBlank(message = "비밀번호는 필수입니다.")
     val password: String,
-)
-
-data class TokenResponse(
-    val accessToken: String,
-    val refreshToken: String,
-    val tokenType: String = "Bearer",
 )

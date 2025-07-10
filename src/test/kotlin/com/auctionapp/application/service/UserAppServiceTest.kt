@@ -1,8 +1,8 @@
 package com.auctionapp.application.service
 
-import com.auctionapp.application.dto.LoginRequest
-import com.auctionapp.application.dto.SignupRequest
-import com.auctionapp.application.dto.TokenResponse
+import com.auctionapp.application.dto.request.LoginRequest
+import com.auctionapp.application.dto.request.SignupRequest
+import com.auctionapp.application.dto.response.TokenResponse
 import com.auctionapp.application.exception.DuplicateEmailException
 import com.auctionapp.application.exception.LoginFailException
 import com.auctionapp.application.exception.LogoutFailException
