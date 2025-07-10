@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/auctions")
+@SuppressWarnings("unused")
 class AuctionController(
     private val auctionAppService: AuctionAppService,
     private val strategyRegistry: ConcurrencyControlStrategyRegistry,

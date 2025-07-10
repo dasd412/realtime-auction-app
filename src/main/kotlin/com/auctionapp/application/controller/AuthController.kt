@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/auth")
+@SuppressWarnings("unused")
 class AuthController(
     private val authAppService: AuthAppService,
 ) {

@@ -15,10 +15,6 @@ data class AuctionCancelResponse(
     val auctionId: Long,
 )
 
-data class BidResponse(
-    val bidId: Long,
-)
-
 data class AuctionDetailResponse(
     val auctionId: Long,
     val productId: Long,

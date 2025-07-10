@@ -26,6 +26,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.transaction.PlatformTransactionManager
 import java.time.LocalDateTime
 
+@SuppressWarnings("unused")
 class AuctionAppServiceTest {
     private val auctionService = mockk<AuctionService>()
     private val auctionRepository = mockk<AuctionRepository>()

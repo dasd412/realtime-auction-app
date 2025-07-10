@@ -10,7 +10,7 @@ data class SignupRequest(
     val email: String,
     @field:NotBlank(message = "비밀번호는 필수입니다.")
     @field:Pattern(
-        regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#\\$%^&*()_+=!~]).{8,16}$",
+        regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&*()_+=!~]).{8,16}$",
         message = "비밀번호는 숫자, 소문자, 대문자, 특수문자를 각각 1개 이상 포함하고 8~16자여야 합니다.",
     )
     val password: String,

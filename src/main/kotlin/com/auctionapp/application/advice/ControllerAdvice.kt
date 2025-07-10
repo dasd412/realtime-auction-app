@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 import java.util.concurrent.TimeoutException
 
 @RestControllerAdvice
+@SuppressWarnings("unused")
 class ControllerAdvice {
     // 400 Bad Request - 입력값 유효성 검사 실패
     @ExceptionHandler(MethodArgumentNotValidException::class)
