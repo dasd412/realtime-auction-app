@@ -7,6 +7,7 @@ import com.auctionapp.application.dto.response.SignupResponse
 import com.auctionapp.application.dto.response.TokenResponse
 import com.auctionapp.application.service.AuthAppService
 import jakarta.validation.Valid
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -24,7 +25,7 @@ class AuthController(
         @Valid @RequestBody request: SignupRequest,
     ): ResponseEntity<SignupResponse> {
         val userId = authAppService.signup(request)
-        return ResponseEntity.ok(SignupResponse(userId))
+        return ResponseEntity.status(HttpStatus.CREATED).body(SignupResponse(userId))
     }
 
     @PostMapping("/login")

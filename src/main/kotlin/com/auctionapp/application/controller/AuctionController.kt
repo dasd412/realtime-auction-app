@@ -8,6 +8,7 @@ import com.auctionapp.application.service.AuctionSortType
 import com.auctionapp.com.auctionapp.expriment.concurrency.ConcurrencyControlStrategyRegistry
 import com.auctionapp.domain.entity.AuctionStatus
 import jakarta.validation.Valid
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -30,7 +31,7 @@ class AuctionController(
                 endTime = request.endTime,
             )
 
-        return ResponseEntity.ok(AuctionRegisterResponse(auctionId))
+        return ResponseEntity.status(HttpStatus.CREATED).body(AuctionRegisterResponse(auctionId))
     }
 
     @GetMapping
@@ -65,7 +66,7 @@ class AuctionController(
         @Valid @RequestBody request: PlaceBidRequest,
     ): ResponseEntity<PlaceBidResponse> {
         val bidId = auctionAppService.placeBid(auctionId, request.amount)
-        return ResponseEntity.ok(PlaceBidResponse(bidId))
+        return ResponseEntity.status(HttpStatus.CREATED).body(PlaceBidResponse(bidId))
     }
 
     // 입찰 진행 (Redis Lock 사용)
@@ -75,7 +76,7 @@ class AuctionController(
         @Valid @RequestBody request: PlaceBidRequest,
     ): ResponseEntity<PlaceBidResponse> {
         val bidId = auctionAppService.placeBidWithRedisLock(auctionId, request.amount)
-        return ResponseEntity.ok(PlaceBidResponse(bidId))
+        return ResponseEntity.status(HttpStatus.CREATED).body(PlaceBidResponse(bidId))
     }
 
     // 특정 경매의 입찰 내역 조회

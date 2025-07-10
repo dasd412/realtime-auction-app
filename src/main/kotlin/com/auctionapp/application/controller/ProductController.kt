@@ -1,8 +1,11 @@
+package com.auctionapp.application.controller
+
 import com.auctionapp.application.dto.request.RegisterProductRequest
 import com.auctionapp.application.dto.request.UpdateProductRequest
 import com.auctionapp.application.dto.response.*
 import com.auctionapp.application.service.ProductAppService
 import jakarta.validation.Valid
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -22,7 +25,7 @@ class ProductController(
                 imageUrl = request.imageUrl,
             )
 
-        return ResponseEntity.ok(ProductRegisterResponse(productId))
+        return ResponseEntity.status(HttpStatus.CREATED).body(ProductRegisterResponse(productId))
     }
 
     @GetMapping
@@ -66,6 +69,6 @@ class ProductController(
         @PathVariable productId: Long,
     ): ResponseEntity<ProductDeleteResponse> {
         productAppService.deleteProduct(productId)
-        return ResponseEntity.ok(ProductDeleteResponse(productId))
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ProductDeleteResponse(productId))
     }
 }
