@@ -1,6 +1,5 @@
 package com.auctionapp.application.controller
 
-
 import com.auctionapp.application.dto.request.LoginRequest
 import com.auctionapp.application.dto.request.SignupRequest
 import com.auctionapp.application.dto.response.TokenResponse

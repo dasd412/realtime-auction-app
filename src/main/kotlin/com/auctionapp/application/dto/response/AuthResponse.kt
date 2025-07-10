@@ -1,6 +1,6 @@
 package com.auctionapp.application.dto.response
 
-data class TokenResponse(
+data class AuthResponse(
     val accessToken: String,
     val refreshToken: String,
     val tokenType: String = "Bearer",
