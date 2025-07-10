@@ -206,6 +206,7 @@ class AuctionAppServiceTest {
     fun registerAuction_success() {
         // given
         val productId = 1L
+        val auctionId = 1L
         val initialPrice = 1000L
         val minimumBidUnit = 100L
         val startTime = LocalDateTime.now()
@@ -219,6 +220,7 @@ class AuctionAppServiceTest {
         every { userRepository.findByEmail(Email(email)) } returns user
         every { productRepository.findByIdOrNull(productId) } returns product
         every { auctionRepository.save(any()) } returns auction
+        every { auction.id } returns auctionId
         every { auctionService.registerAuction(any(), any(), any()) } returns Unit
 
         // when

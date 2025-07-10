@@ -7,7 +7,7 @@ data class SignupResponse(
 data class TokenResponse(
     val accessToken: String,
     val refreshToken: String,
-    val tokenType: String = "Bearer"
+    val tokenType: String = "Bearer",
 )
 
 data class LogoutResponse(

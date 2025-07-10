@@ -58,7 +58,7 @@ class AuctionAppService(
         minimumBidUnit: Long,
         startTime: LocalDateTime,
         endTime: LocalDateTime,
-    ) {
+    ): Long {
         val username = SecurityUtil.getCurrentUsername() ?: throw UnauthorizedException()
 
         val user = userRepository.findByEmail(Email(username)) ?: throw NotFoundUserException()
@@ -76,7 +76,9 @@ class AuctionAppService(
             )
 
         auctionService.registerAuction(auction, user, product)
-        auctionRepository.save(auction)
+        val saved = auctionRepository.save(auction)
+
+        return saved.id!!
     }
 
     @Transactional(readOnly = true)

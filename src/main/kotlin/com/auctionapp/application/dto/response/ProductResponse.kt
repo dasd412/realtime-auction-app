@@ -5,15 +5,15 @@ import com.auctionapp.domain.entity.ProductStatus
 import org.springframework.data.domain.Page
 
 data class ProductRegisterResponse(
-    val productId: Long
+    val productId: Long,
 )
 
 data class ProductUpdateResponse(
-    val productId: Long
+    val productId: Long,
 )
 
 data class ProductDeleteResponse(
-    val productId: Long
+    val productId: Long,
 )
 
 data class ProductDetailResponse(
@@ -42,7 +42,7 @@ data class ProductSimpleResponse(
     val productId: Long,
     val name: String,
     val imageUrl: String,
-    val status: ProductStatus
+    val status: ProductStatus,
 )
 
 fun Product.toSimpleResponse(): ProductSimpleResponse {
@@ -50,7 +50,7 @@ fun Product.toSimpleResponse(): ProductSimpleResponse {
         productId = this.id!!,
         name = this.name,
         imageUrl = this.imageUrl,
-        status = this.status
+        status = this.status,
     )
 }
 
@@ -68,8 +68,6 @@ fun Page<Product>.toListResponse(): ProductListResponse {
         totalElements = this.totalElements,
         totalPages = this.totalPages,
         currentPage = this.number,
-        hasNext = this.hasNext()
+        hasNext = this.hasNext(),
     )
 }
-
-

@@ -29,20 +29,20 @@ class ProductController(
     fun getProductList(
         @RequestParam(required = false) name: String?,
         @RequestParam(defaultValue = "0") pageNumber: Int,
-    ): ResponseEntity<ProductListResponse>{
+    ): ResponseEntity<ProductListResponse> {
         return ResponseEntity.ok(productAppService.getProductList(name, pageNumber).toListResponse())
     }
 
     // 내 상품 목록 조회
     @GetMapping("/my-products")
-    fun getMyProducts() : ResponseEntity<List<ProductDetailResponse>> {
+    fun getMyProducts(): ResponseEntity<List<ProductDetailResponse>> {
         return ResponseEntity.ok(productAppService.getProductListOfUser().map { it.toDetailResponse() })
     }
 
     @GetMapping("/{productId}")
     fun getProductDetail(
         @PathVariable productId: Long,
-    ) : ResponseEntity<ProductDetailResponse> {
+    ): ResponseEntity<ProductDetailResponse> {
         return ResponseEntity.ok(productAppService.getProductDetail(productId).toDetailResponse())
     }
 
