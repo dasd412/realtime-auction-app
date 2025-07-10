@@ -2,7 +2,7 @@ package com.auctionapp.application.service
 
 import com.auctionapp.application.dto.request.LoginRequest
 import com.auctionapp.application.dto.request.SignupRequest
-import com.auctionapp.application.dto.response.TokenResponse
+import com.auctionapp.application.dto.response.AuthResponse
 import com.auctionapp.application.exception.DuplicateEmailException
 import com.auctionapp.application.exception.LoginFailException
 import com.auctionapp.application.exception.LogoutFailException
@@ -22,7 +22,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 @Service
-class UserAppService(
+class AuthAppService(
     private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder,
     private val jwtTokenProvider: JwtTokenProvider,
@@ -48,7 +48,7 @@ class UserAppService(
     }
 
     @Transactional(readOnly = true)
-    fun login(request: LoginRequest): TokenResponse {
+    fun login(request: LoginRequest): AuthResponse {
         val user = userRepository.findByEmail(Email(request.email)) ?: throw LoginFailException()
 
         if (!passwordEncoder.matches(request.password, user.password)) {
@@ -61,11 +61,11 @@ class UserAppService(
         val accessToken = jwtTokenProvider.createAccessToken(authentication)
         val refreshToken = jwtTokenProvider.createRefreshToken(authentication)
 
-        return TokenResponse(accessToken, refreshToken)
+        return AuthResponse(accessToken, refreshToken)
     }
 
     @Transactional
-    fun refreshToken(refreshToken: String): TokenResponse {
+    fun refreshToken(refreshToken: String): AuthResponse {
         if (!jwtTokenProvider.validateToken(refreshToken)) {
             throw UnavailableRefreshTokenException()
         }
@@ -84,7 +84,7 @@ class UserAppService(
 
         val newAccessToken = jwtTokenProvider.createAccessToken(authentication)
 
-        return TokenResponse(newAccessToken, refreshToken)
+        return AuthResponse(newAccessToken, refreshToken)
     }
 
     fun logout(accessToken: String) {

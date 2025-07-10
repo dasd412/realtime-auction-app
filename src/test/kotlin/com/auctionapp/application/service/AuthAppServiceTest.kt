@@ -2,7 +2,7 @@ package com.auctionapp.application.service
 
 import com.auctionapp.application.dto.request.LoginRequest
 import com.auctionapp.application.dto.request.SignupRequest
-import com.auctionapp.application.dto.response.TokenResponse
+import com.auctionapp.application.dto.response.AuthResponse
 import com.auctionapp.application.exception.DuplicateEmailException
 import com.auctionapp.application.exception.LoginFailException
 import com.auctionapp.application.exception.LogoutFailException
@@ -23,7 +23,7 @@ import org.springframework.data.redis.core.ValueOperations
 import org.springframework.security.crypto.password.PasswordEncoder
 import java.util.*
 
-class UserAppServiceTest {
+class AuthAppServiceTest {
     // 모킹할 외부 의존성
     private val userRepository = mockk<UserRepository>()
     private val passwordEncoder = mockk<PasswordEncoder>()
@@ -32,8 +32,8 @@ class UserAppServiceTest {
     private val valueOperations = mockk<ValueOperations<String, String>>()
 
     // 테스트 대상 서비스
-    private val userAppService =
-        UserAppService(
+    private val authAppService =
+        AuthAppService(
             userRepository = userRepository,
             passwordEncoder = passwordEncoder,
             jwtTokenProvider = jwtTokenProvider,
@@ -70,7 +70,7 @@ class UserAppServiceTest {
         every { userRepository.save(any()) } returns savedUser
 
         // when
-        val result = userAppService.signup(request)
+        val result = authAppService.signup(request)
 
         // then
         assertThat(result).isEqualTo(1L)
@@ -95,7 +95,7 @@ class UserAppServiceTest {
 
         // when, then
         assertThrows<DuplicateEmailException> {
-            userAppService.signup(request)
+            authAppService.signup(request)
         }
 
         verify { userRepository.findByEmail(Email(request.email)) }
@@ -122,7 +122,7 @@ class UserAppServiceTest {
             )
         val accessToken = "access-token"
         val refreshToken = "refresh-token"
-        val tokenResponse = TokenResponse(accessToken, refreshToken)
+        val tokenResponse = AuthResponse(accessToken, refreshToken)
 
         every { userRepository.findByEmail(Email(request.email)) } returns user
         every { passwordEncoder.matches(request.password, user.password) } returns true
@@ -130,7 +130,7 @@ class UserAppServiceTest {
         every { jwtTokenProvider.createRefreshToken(any()) } returns refreshToken
 
         // when
-        val result = userAppService.login(request)
+        val result = authAppService.login(request)
 
         // then
         assertThat(result).isEqualTo(tokenResponse)
@@ -154,7 +154,7 @@ class UserAppServiceTest {
 
         // when, then
         assertThrows<LoginFailException> {
-            userAppService.login(request)
+            authAppService.login(request)
         }
 
         verify { userRepository.findByEmail(Email(request.email)) }
@@ -186,7 +186,7 @@ class UserAppServiceTest {
 
         // when, then
         assertThrows<LoginFailException> {
-            userAppService.login(request)
+            authAppService.login(request)
         }
 
         verify { userRepository.findByEmail(Email(request.email)) }
@@ -219,7 +219,7 @@ class UserAppServiceTest {
         every { jwtTokenProvider.createAccessToken(any()) } returns newAccessToken
 
         // when
-        val result = userAppService.refreshToken(refreshToken)
+        val result = authAppService.refreshToken(refreshToken)
 
         // then
         assertThat(result.accessToken).isEqualTo(newAccessToken)
@@ -242,7 +242,7 @@ class UserAppServiceTest {
 
         // when, then
         assertThrows<UnavailableRefreshTokenException> {
-            userAppService.refreshToken(expiredToken)
+            authAppService.refreshToken(expiredToken)
         }
 
         verify { jwtTokenProvider.validateToken(expiredToken) }
@@ -264,7 +264,7 @@ class UserAppServiceTest {
 
         // when, then
         assertThrows<UnavailableRefreshTokenException> {
-            userAppService.refreshToken(refreshToken)
+            authAppService.refreshToken(refreshToken)
         }
 
         verify { jwtTokenProvider.validateToken(refreshToken) }
@@ -289,7 +289,7 @@ class UserAppServiceTest {
 
         // when, then
         assertThrows<UnavailableRefreshTokenException> {
-            userAppService.refreshToken(refreshToken)
+            authAppService.refreshToken(refreshToken)
         }
 
         verify { jwtTokenProvider.validateToken(refreshToken) }
@@ -322,7 +322,7 @@ class UserAppServiceTest {
         every { redisTemplate.delete("RT:$email") } returns true
 
         // when
-        userAppService.logout(accessToken)
+        authAppService.logout(accessToken)
 
         // then
         verify { jwtTokenProvider.validateToken(accessToken) }
@@ -343,7 +343,7 @@ class UserAppServiceTest {
 
         // when, then
         assertThrows<LogoutFailException> {
-            userAppService.logout(invalidToken)
+            authAppService.logout(invalidToken)
         }
 
         verify { jwtTokenProvider.validateToken(invalidToken) }
