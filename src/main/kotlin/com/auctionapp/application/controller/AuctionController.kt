@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*
 
 @SecurityRequirement(name = "bearer-jwt")
 @RestController
-@RequestMapping("/api/auctions")
+@RequestMapping("/auctions")
 @SuppressWarnings("unused")
 class AuctionController(
     private val auctionAppService: AuctionAppService,

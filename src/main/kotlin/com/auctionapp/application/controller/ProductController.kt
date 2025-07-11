@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*
 
 @SecurityRequirement(name = "bearer-jwt")
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("/products")
 @SuppressWarnings("unused")
 class ProductController(
     private val productAppService: ProductAppService,
