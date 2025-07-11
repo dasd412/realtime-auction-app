@@ -1,17 +1,15 @@
 package com.auctionapp.domain.entity
 
-import com.auctionapp.domain.exception.InvalidPasswordException
 import com.auctionapp.domain.exception.InvalidUserNameException
 import com.auctionapp.domain.vo.Email
 import jakarta.persistence.*
-import java.util.regex.Pattern
 
 @Entity
 @Table(name = "users")
 class User(
     @Embedded
     var email: Email,
-    password: String,
+    encodedPassword: String,
     name: String,
     @Enumerated(EnumType.STRING)
     val role: Role,
@@ -25,13 +23,7 @@ class User(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 ) {
-    var password: String = password
-        set(value) {
-            if (!isValidPassword(value)) {
-                throw InvalidPasswordException()
-            }
-            field = value
-        }
+    var password: String = encodedPassword
 
     var name: String = name
         set(value) {
@@ -42,18 +34,9 @@ class User(
         }
 
     init {
-        if (!isValidPassword(password)) {
-            throw InvalidPasswordException()
-        }
         if (name.isBlank()) {
             throw InvalidUserNameException()
         }
-    }
-
-    private fun isValidPassword(password: String): Boolean {
-        // 숫자, 소문자, 대문자, 특수문자(@#$%^&*()_+=!~) 각각 1개 이상 포함, 8~16자
-        val regex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#\\$%^&*()_+=!~]).{8,16}$"
-        return Pattern.matches(regex, password)
     }
 
     fun registerProduct(product: Product) {
@@ -86,7 +69,7 @@ class User(
         ): User {
             return User(
                 email = email,
-                password = password,
+                encodedPassword = password,
                 name = name,
                 role = role,
                 id = id,

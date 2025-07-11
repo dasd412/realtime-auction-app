@@ -9,6 +9,7 @@ import com.auctionapp.application.exception.LogoutFailException
 import com.auctionapp.application.exception.UnavailableRefreshTokenException
 import com.auctionapp.domain.entity.Role
 import com.auctionapp.domain.entity.User
+import com.auctionapp.domain.exception.InvalidPasswordException
 import com.auctionapp.domain.vo.Email
 import com.auctionapp.infrastructure.persistence.UserRepository
 import com.auctionapp.infrastructure.security.JwtTokenProvider
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
 import java.util.concurrent.TimeUnit
+import java.util.regex.Pattern
 
 @Service
 class AuthAppService(
@@ -30,6 +32,10 @@ class AuthAppService(
 ) {
     @Transactional
     fun signup(request: SignupRequest): Long {
+        if (!isValidPassword(request.password)) {
+            throw InvalidPasswordException()
+        }
+
         val found = userRepository.findByEmail(Email(request.email))
 
         if (found != null) {
@@ -39,12 +45,18 @@ class AuthAppService(
         val user =
             User(
                 email = Email(request.email),
-                password = passwordEncoder.encode(request.password),
+                encodedPassword = passwordEncoder.encode(request.password),
                 name = request.name,
                 role = Role.CUSTOMER,
             )
 
         return userRepository.save(user).id!!
+    }
+
+    private fun isValidPassword(password: String): Boolean {
+        // 숫자, 소문자, 대문자, 특수문자(@#$%^&*()_+=!~) 각각 1개 이상 포함, 8~16자
+        val regex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&*()_+=!~]).{8,16}$"
+        return Pattern.matches(regex, password)
     }
 
     @Transactional(readOnly = true)

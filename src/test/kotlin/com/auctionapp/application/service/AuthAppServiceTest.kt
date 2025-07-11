@@ -60,7 +60,7 @@ class AuthAppServiceTest {
             User(
                 id = 1L,
                 email = Email(request.email),
-                password = encodedPassword,
+                encodedPassword = encodedPassword,
                 name = request.name,
                 role = Role.CUSTOMER,
             )
@@ -116,7 +116,7 @@ class AuthAppServiceTest {
             User(
                 id = 1L,
                 email = Email(request.email),
-                password = "Test12345!",
+                encodedPassword = "Test12345!",
                 name = "Test User",
                 role = Role.CUSTOMER,
             )
@@ -176,7 +176,7 @@ class AuthAppServiceTest {
             User(
                 id = 1L,
                 email = Email(request.email),
-                password = "Test12345!",
+                encodedPassword = "Test12345!",
                 name = "Test User",
                 role = Role.CUSTOMER,
             )
@@ -205,7 +205,7 @@ class AuthAppServiceTest {
             User(
                 id = 1L,
                 email = Email(email),
-                password = "Test12345!",
+                encodedPassword = "Test12345!",
                 name = "Test User",
                 role = Role.CUSTOMER,
             )

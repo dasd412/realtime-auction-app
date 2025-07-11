@@ -82,7 +82,7 @@ dependencies {
     // JOOQ 코드 생성을 위한 별도 의존성
     jooqGenerator("com.h2database:h2")
 
-    //Specification
+    // Specification
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
 }
 

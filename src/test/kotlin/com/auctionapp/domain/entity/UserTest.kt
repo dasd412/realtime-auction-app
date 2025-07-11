@@ -1,7 +1,6 @@
 package com.auctionapp.domain.entity
 
 import com.auctionapp.domain.exception.InvalidEmailException
-import com.auctionapp.domain.exception.InvalidPasswordException
 import com.auctionapp.domain.exception.InvalidUserNameException
 import com.auctionapp.domain.vo.Email
 import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
@@ -18,30 +17,6 @@ class UserTest {
         // when & then
         assertThrows<InvalidEmailException> {
             Email("test")
-        }
-    }
-
-    @Test
-    @DisplayName("적절한 비밀 번호 형식이 아니라면 실패한다(길이)")
-    fun userInvalidPasswordTest1() {
-        // given
-        val invalidPassword = "Test12!"
-
-        // when & then
-        assertThrows<InvalidPasswordException> {
-            User.fixture(password = invalidPassword)
-        }
-    }
-
-    @Test
-    @DisplayName("적절한 비밀 번호 형식이 아니라면 실패한다(문자 종류)")
-    fun userInvalidPasswordTest2() {
-        // given
-        val invalidPassword = "testtesttest"
-
-        // when & then
-        assertThrows<InvalidPasswordException> {
-            User.fixture(password = invalidPassword)
         }
     }
 
@@ -67,7 +42,7 @@ class UserTest {
 
         // when
         val user =
-            User(email = validEmail, password = validPassword, name = name, role = Role.CUSTOMER)
+            User(email = validEmail, encodedPassword = validPassword, name = name, role = Role.CUSTOMER)
 
         // then
         assertThat(user.email).isEqualTo(validEmail)
@@ -84,19 +59,6 @@ class UserTest {
         // when & then
         assertThrows<InvalidEmailException> {
             user.email = Email("invalid-email")
-        }
-    }
-
-    @Test
-    @DisplayName("객체 생성 후 유효하지 않은 비밀번호로 변경하면 실패한다")
-    fun changeInvalidPasswordAfterCreationTest() {
-        // given
-        val user = User.fixture()
-        val invalidPassword = "weak"
-
-        // when & then
-        assertThrows<InvalidPasswordException> {
-            user.password = invalidPassword
         }
     }
 
