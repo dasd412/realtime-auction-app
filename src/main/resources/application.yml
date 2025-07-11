@@ -29,9 +29,6 @@ spring:
 
 server:
   port: 8080
-  servlet:
-    context-path: /api
-
 jwt:
   secret: eW91ci1zZWNyZXQta2V5LWhlcmUtc2hvdWxkLWJlLWF0LWxlYXN0LTMyLWNoYXJhY3RlcnM=
   expiration: 86400000 # 24 hours in milliseconds

@@ -7,11 +7,13 @@ import com.auctionapp.application.service.AuctionAppService
 import com.auctionapp.application.service.AuctionSortType
 import com.auctionapp.com.auctionapp.expriment.concurrency.ConcurrencyControlStrategyRegistry
 import com.auctionapp.domain.entity.AuctionStatus
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
+@SecurityRequirement(name = "bearer-jwt")
 @RestController
 @RequestMapping("/api/auctions")
 @SuppressWarnings("unused")

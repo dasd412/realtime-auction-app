@@ -6,6 +6,7 @@ import com.auctionapp.application.dto.response.LogoutResponse
 import com.auctionapp.application.dto.response.SignupResponse
 import com.auctionapp.application.dto.response.TokenResponse
 import com.auctionapp.application.service.AuthAppService
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
+@SecurityRequirement(name = "bearer-jwt")
 @RestController
 @RequestMapping("/auth")
 @SuppressWarnings("unused")

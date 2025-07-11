@@ -28,9 +28,10 @@ class SecurityConfig(
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests {
                 it.requestMatchers("/", "/index.html", "/static/**").permitAll()
+                    .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**").permitAll()
                     .requestMatchers("/h2-console/**").permitAll()
                     .requestMatchers("/auth/login", "/auth/signup").permitAll()
-                    .requestMatchers("**/admin/**").hasRole("ADMIN")
+                    .requestMatchers("/admin/**").hasRole("ADMIN") 
                     .anyRequest().authenticated()
             }
             .addFilterBefore(
