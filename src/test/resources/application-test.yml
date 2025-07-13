@@ -13,6 +13,9 @@ spring:
         init:
             schema-locations: classpath:schema-test.sql
             mode: always
+    redis: # 테스트 환경에선 localhost 6379 포트로
+        host: localhost
+        port: 6379
 logging:
     level:
         org.redisson: DEBUG    # Redisson 전체 로그
