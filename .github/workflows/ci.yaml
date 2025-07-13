@@ -101,9 +101,21 @@ jobs:
 
       - name: Start application
         run: |
-          java -jar build/libs/*.jar &
+          nohup java -jar build/libs/*.jar --server.port=8080 > app.log 2>&1 &
+          APP_PID=$!
           echo "Waiting for application to start..."
-          sleep 30  # 서버가 시작될 때까지 대기
+          sleep 45  # 시작 시간을 30초에서 45초로 늘립니다
+          
+          # 서버 상태 확인
+          if ps -p $APP_PID > /dev/null; then
+            echo "Application started with PID $APP_PID"
+            curl -v http://localhost:8080/actuator/health || echo "Health check failed but continuing"
+            cat app.log | tail -n 50
+          else
+            echo "Application failed to start"
+            cat app.log
+            exit 1
+          fi
         env:
           SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/auction_test_db
           SPRING_DATASOURCE_USERNAME: root
@@ -111,6 +123,8 @@ jobs:
           SPRING_DATA_REDIS_HOST: localhost
           SPRING_DATA_REDIS_PORT: 6379
           REDISSON_ADDRESS: redis://localhost:6379
+          SERVER_PORT: 8080
+          SERVER_SERVLET_CONTEXT_PATH: /
 
       - name: Run API Tests with Newman
         run: |
@@ -119,7 +133,7 @@ jobs:
           --reporters cli,htmlextra \
           --reporter-htmlextra-export build/reports/newman/report.html
         env:
-          BASE_URL: http://localhost:8080
+          BASE_URL: http://localhost:8080/api
 
       - name: Save Newman Report
         if: always()
