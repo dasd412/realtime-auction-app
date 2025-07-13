@@ -108,7 +108,7 @@ jobs:
           nohup java -jar $EXEC_JAR --server.port=8080 > app.log 2>&1 &
           APP_PID=$!
           echo "Waiting for application to start..."
-          sleep 45
+          sleep 60
           
           # 서버 상태 확인
           if ps -p $APP_PID > /dev/null; then
@@ -128,7 +128,7 @@ jobs:
           SPRING_DATA_REDIS_PORT: 6379
           REDISSON_ADDRESS: redis://localhost:6379
           SERVER_PORT: 8080
-          SERVER_SERVLET_CONTEXT_PATH: /
+          SERVER_SERVLET_CONTEXT_PATH: /api  
 
       - name: Run API Tests with Newman
         run: |
