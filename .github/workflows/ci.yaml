@@ -114,8 +114,8 @@ jobs:
 
       - name: Run API Tests with Newman
         run: |
-          newman run ./postman/auction-api.postman_collection.json \
-          --environment ./postman/auction-api.postman_environment.json \
+          newman run ./postman/auction.postman_collection.json \
+          --environment ./postman/-auctionEnvironment.postman_environment.json \
           --reporters cli,htmlextra \
           --reporter-htmlextra-export build/reports/newman/report.html
         env:
