@@ -96,6 +96,22 @@ jobs:
       - name: Install Newman
         run: npm install -g newman newman-reporter-htmlextra
 
+      - name: Build application
+        run: ./gradlew build -x test
+
+      - name: Start application
+        run: |
+          java -jar build/libs/*.jar &
+          echo "Waiting for application to start..."
+          sleep 30  # 서버가 시작될 때까지 대기
+        env:
+          SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/auction_test_db
+          SPRING_DATASOURCE_USERNAME: root
+          SPRING_DATASOURCE_PASSWORD: root
+          SPRING_DATA_REDIS_HOST: localhost
+          SPRING_DATA_REDIS_PORT: 6379
+          REDISSON_ADDRESS: redis://localhost:6379
+
       - name: Run API Tests with Newman
         run: |
           newman run ./postman/auction-api.postman_collection.json \
