@@ -62,7 +62,7 @@ class ProductControllerTest {
 
         // when & then
         mockMvc.perform(
-            post("/api/products")
+            post("/products")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)),
         )
@@ -84,7 +84,7 @@ class ProductControllerTest {
 
         // when & then
         mockMvc.perform(
-            get("/api/products")
+            get("/products")
                 .param("pageNumber", "0"),
         )
             .andDo(print())
@@ -104,7 +104,7 @@ class ProductControllerTest {
 
         // when & then
         mockMvc.perform(
-            get("/api/products")
+            get("/products")
                 .param("name", "검색")
                 .param("pageNumber", "0"),
         )
@@ -126,7 +126,7 @@ class ProductControllerTest {
 
         // when & then
         mockMvc.perform(
-            get("/api/products/my-products"),
+            get("/products/my-products"),
         )
             .andDo(print())
             .andExpect(status().isOk)
@@ -144,7 +144,7 @@ class ProductControllerTest {
 
         // when & then
         mockMvc.perform(
-            get("/api/products/{productId}", productId),
+            get("/products/{productId}", productId),
         )
             .andDo(print())
             .andExpect(status().isOk)
@@ -162,7 +162,7 @@ class ProductControllerTest {
 
         // when & then
         mockMvc.perform(
-            get("/api/products/{productId}", productId),
+            get("/products/{productId}", productId),
         )
             .andDo(print())
             .andExpect(status().isNotFound)
@@ -190,7 +190,7 @@ class ProductControllerTest {
 
         // when & then
         mockMvc.perform(
-            put("/api/products/{productId}", productId)
+            put("/products/{productId}", productId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)),
         )
@@ -220,7 +220,7 @@ class ProductControllerTest {
 
         // when & then
         mockMvc.perform(
-            put("/api/products/{productId}", productId)
+            put("/products/{productId}", productId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)),
         )
@@ -250,7 +250,7 @@ class ProductControllerTest {
 
         // when & then
         mockMvc.perform(
-            put("/api/products/{productId}", productId)
+            put("/products/{productId}", productId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)),
         )
@@ -269,7 +269,7 @@ class ProductControllerTest {
 
         // when & then
         mockMvc.perform(
-            delete("/api/products/{productId}", productId),
+            delete("/products/{productId}", productId),
         )
             .andDo(print())
             .andExpect(status().isNoContent())
@@ -285,7 +285,7 @@ class ProductControllerTest {
 
         // when & then
         mockMvc.perform(
-            delete("/api/products/{productId}", productId),
+            delete("/products/{productId}", productId),
         )
             .andDo(print())
             .andExpect(status().isForbidden)
@@ -302,7 +302,7 @@ class ProductControllerTest {
 
         // when & then
         mockMvc.perform(
-            delete("/api/products/{productId}", productId),
+            delete("/products/{productId}", productId),
         )
             .andDo(print())
             .andExpect(status().isBadRequest)

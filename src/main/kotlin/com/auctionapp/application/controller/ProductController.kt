@@ -4,13 +4,11 @@ import com.auctionapp.application.dto.request.RegisterProductRequest
 import com.auctionapp.application.dto.request.UpdateProductRequest
 import com.auctionapp.application.dto.response.*
 import com.auctionapp.application.service.ProductAppService
-import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
-@SecurityRequirement(name = "bearer-jwt")
 @RestController
 @RequestMapping("/products")
 @SuppressWarnings("unused")

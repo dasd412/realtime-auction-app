@@ -81,7 +81,7 @@ class AuctionControllerTest {
 
         // when & then
         mockMvc.perform(
-            post("/api/auctions")
+            post("/auctions")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)),
         )
@@ -115,7 +115,7 @@ class AuctionControllerTest {
 
         // when & then
         mockMvc.perform(
-            post("/api/auctions")
+            post("/auctions")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)),
         )
@@ -137,7 +137,7 @@ class AuctionControllerTest {
 
         // when & then
         mockMvc.perform(
-            get("/api/auctions")
+            get("/auctions")
                 .param("status", "ACTIVE")
                 .param("sortType", "NONE")
                 .param("pageNumber", "0"),
@@ -163,7 +163,7 @@ class AuctionControllerTest {
 
         // when & then
         mockMvc.perform(
-            get("/api/auctions/{auctionId}", auctionId),
+            get("/auctions/{auctionId}", auctionId),
         )
             .andDo(print())
             .andExpect(status().isOk)
@@ -180,7 +180,7 @@ class AuctionControllerTest {
 
         // when & then
         mockMvc.perform(
-            get("/api/auctions/{auctionId}", auctionId),
+            get("/auctions/{auctionId}", auctionId),
         )
             .andDo(print())
             .andExpect(status().isNotFound)
@@ -197,7 +197,7 @@ class AuctionControllerTest {
 
         // when & then
         mockMvc.perform(
-            delete("/api/auctions/{auctionId}", auctionId),
+            delete("/auctions/{auctionId}", auctionId),
         )
             .andDo(print())
             .andExpect(status().isOk)
@@ -214,7 +214,7 @@ class AuctionControllerTest {
 
         // when & then
         mockMvc.perform(
-            delete("/api/auctions/{auctionId}", auctionId),
+            delete("/auctions/{auctionId}", auctionId),
         )
             .andDo(print())
             .andExpect(status().isForbidden)
@@ -231,7 +231,7 @@ class AuctionControllerTest {
 
         // when & then
         mockMvc.perform(
-            delete("/api/auctions/{auctionId}", auctionId),
+            delete("/auctions/{auctionId}", auctionId),
         )
             .andDo(print())
             .andExpect(status().isBadRequest)
@@ -250,7 +250,7 @@ class AuctionControllerTest {
 
         // when & then
         mockMvc.perform(
-            post("/api/auctions/{auctionId}/bids", auctionId)
+            post("/auctions/{auctionId}/bids", auctionId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)),
         )
@@ -270,7 +270,7 @@ class AuctionControllerTest {
 
         // when & then
         mockMvc.perform(
-            post("/api/auctions/{auctionId}/bids", auctionId)
+            post("/auctions/{auctionId}/bids", auctionId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)),
         )
@@ -290,7 +290,7 @@ class AuctionControllerTest {
 
         // when & then
         mockMvc.perform(
-            post("/api/auctions/{auctionId}/bids", auctionId)
+            post("/auctions/{auctionId}/bids", auctionId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)),
         )
@@ -311,7 +311,7 @@ class AuctionControllerTest {
 
         // when & then
         mockMvc.perform(
-            post("/api/auctions/{auctionId}/bids/distributed", auctionId)
+            post("/auctions/{auctionId}/bids/distributed", auctionId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)),
         )
@@ -331,7 +331,7 @@ class AuctionControllerTest {
 
         // when & then
         mockMvc.perform(
-            post("/api/auctions/{auctionId}/bids/distributed", auctionId)
+            post("/auctions/{auctionId}/bids/distributed", auctionId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)),
         )
@@ -354,7 +354,7 @@ class AuctionControllerTest {
 
         // when & then
         mockMvc.perform(
-            get("/api/auctions/{auctionId}/bids", auctionId)
+            get("/auctions/{auctionId}/bids", auctionId)
                 .param("pageNumber", "0"),
         )
             .andDo(print())
@@ -375,7 +375,7 @@ class AuctionControllerTest {
 
         // when & then
         mockMvc.perform(
-            get("/api/auctions/my-auctions")
+            get("/auctions/my-auctions")
                 .param("pageNumber", "0"),
         )
             .andDo(print())
@@ -391,7 +391,7 @@ class AuctionControllerTest {
 
         // when & then
         mockMvc.perform(
-            get("/api/auctions/my-auctions")
+            get("/auctions/my-auctions")
                 .param("pageNumber", "0"),
         )
             .andDo(print())
@@ -412,7 +412,7 @@ class AuctionControllerTest {
 
         // when & then
         mockMvc.perform(
-            get("/api/auctions/my-bids/auctions")
+            get("/auctions/my-bids/auctions")
                 .param("pageNumber", "0"),
         )
             .andDo(print())
@@ -433,7 +433,7 @@ class AuctionControllerTest {
 
         // when & then
         mockMvc.perform(
-            get("/api/auctions/my-bids")
+            get("/auctions/my-bids")
                 .param("pageNumber", "0"),
         )
             .andDo(print())
@@ -450,7 +450,7 @@ class AuctionControllerTest {
 
         // when & then
         mockMvc.perform(
-            get("/api/auctions/admin/strategy"),
+            get("/auctions/admin/strategy"),
         )
             .andDo(print())
             .andExpect(status().isOk)
@@ -467,7 +467,7 @@ class AuctionControllerTest {
 
         // when & then
         mockMvc.perform(
-            post("/api/auctions/admin/strategy")
+            post("/auctions/admin/strategy")
                 .param("strategy", newStrategy),
         )
             .andDo(print())
