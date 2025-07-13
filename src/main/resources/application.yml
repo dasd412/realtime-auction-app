@@ -16,9 +16,6 @@ spring:
     console:
       enabled: true
       path: /h2-console
-  redis:
-    host: localhost
-    port: 6379
   batch:
     job:
       enabled: false
@@ -26,6 +23,10 @@ spring:
       initialize-schema: always
   mvc:
     static-path-pattern: /**
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST:localhost}
+      port: ${SPRING_DATA_REDIS_PORT:6379}
 
 server:
   port: 8080
@@ -53,3 +54,7 @@ app:
   security:
     dev-mode: true
     extended-token-expiry: true  # 개발 환경에서 토큰 유효 기간 연장 (예: 1일)
+
+# Redisson 설정
+redisson:
+  address: ${REDISSON_ADDRESS:redis://localhost:6379}

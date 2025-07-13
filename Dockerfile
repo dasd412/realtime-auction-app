@@ -23,8 +23,13 @@ COPY --from=build /app/build/libs/*.jar app.jar
 ENV SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/auction_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
 ENV SPRING_DATASOURCE_USERNAME=auction_user 
 ENV SPRING_DATASOURCE_PASSWORD=auction_password
-ENV SPRING_REDIS_HOST=redis
-ENV SPRING_REDIS_PORT=6379
+
+# Spring Boot 3 명명 규칙에 맞게 Redis 환경 변수 설정
+ENV SPRING_DATA_REDIS_HOST=redis
+ENV SPRING_DATA_REDIS_PORT=6379
+
+# Redisson 직접 설정을 위한 환경 변수
+ENV REDISSON_ADDRESS=redis://redis:6379
 
 # 애플리케이션 실행
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]

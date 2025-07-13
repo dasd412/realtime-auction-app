@@ -58,6 +58,30 @@ services:
     depends_on:
       - redis
 
+  # Spring Boot 애플리케이션 서비스
+  app:
+    build: .
+    container_name: auction-app
+    ports:
+      - "8080:8080"
+    networks:
+      default:
+        aliases:
+          - app
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/auction_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=auction_user
+      - SPRING_DATASOURCE_PASSWORD=auction_password
+      # Spring Boot 3 명명 규칙에 맞게 환경 변수 수정
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
+      # Redisson 직접 설정을 위한 환경 변수
+      - REDISSON_ADDRESS=redis://redis:6379
 volumes:
   mysql-data:
   redis-data:
