@@ -101,10 +101,14 @@ jobs:
 
       - name: Start application
         run: |
-          nohup java -jar build/libs/*.jar --server.port=8080 > app.log 2>&1 &
+          # plain이 아닌 실행 가능한 JAR 파일 찾기
+          EXEC_JAR=$(find build/libs/ -name "*.jar" -not -name "*plain.jar" | head -n 1)
+          echo "Found executable JAR: $EXEC_JAR"
+          
+          nohup java -jar $EXEC_JAR --server.port=8080 > app.log 2>&1 &
           APP_PID=$!
           echo "Waiting for application to start..."
-          sleep 45  # 시작 시간을 30초에서 45초로 늘립니다
+          sleep 45
           
           # 서버 상태 확인
           if ps -p $APP_PID > /dev/null; then
