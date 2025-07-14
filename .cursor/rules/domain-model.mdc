@@ -21,7 +21,6 @@ alwaysApply: true
 - 경매 진행 정보 관리
 - 시작가, 최소 입찰 단위, 시작/종료 시간 포함
 - 상태(AuctionStatus): NOT_STARTED, ONGOING, ENDED
-- 낙관적 락(Version) 구현
 
 ### Bid
 - 입찰 정보 관리
