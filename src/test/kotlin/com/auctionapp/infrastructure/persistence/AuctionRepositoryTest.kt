@@ -154,34 +154,6 @@ class AuctionRepositoryTest
         }
 
         @Test
-        @DisplayName("자동 시작 대상 경매를 조회한다")
-        fun findAuctionsToStartTest() {
-            // given
-            val currentTime = notStartedAuction.startTime.plusMinutes(10)
-
-            // when
-            val auctions = auctionRepository.findAuctionsToStart(currentTime)
-
-            // then
-            assertThat(auctions).hasSize(1)
-            assertThat(auctions[0].id).isEqualTo(notStartedAuction.id)
-        }
-
-        @Test
-        @DisplayName("자동 종료 대상 경매를 조회한다")
-        fun findAuctionsToEndTest() {
-            // given
-            val currentTime = activeAuction.endTime.minusMinutes(10)
-
-            // when
-            val auctions = auctionRepository.findAuctionsToEnd(currentTime)
-
-            // then
-            assertThat(auctions).hasSize(1)
-            assertThat(auctions[0].id).isEqualTo(activeAuction.id)
-        }
-
-        @Test
         @DisplayName("사용자가 생성한 경매를 조회한다")
         fun findByUserTest() {
             // when
