@@ -34,12 +34,6 @@ dependencies {
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     implementation("org.springframework.boot:spring-boot-starter-quartz") // Scheduler
 
-    // JOOQ
-    implementation("org.springframework.boot:spring-boot-starter-jooq")
-    implementation("org.jooq:jooq:3.18.5")
-    implementation("org.jooq:jooq-meta:3.18.5")
-    implementation("org.jooq:jooq-codegen:3.18.5")
-
     // Kotlin
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -80,45 +74,8 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter:1.19.3")
     testImplementation("it.ozimov:embedded-redis:0.7.3")
 
-    // JOOQ 코드 생성을 위한 별도 의존성
-    jooqGenerator("com.h2database:h2")
-
     // Specification
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
-}
-
-jooq {
-    version.set("3.18.5") // JOOQ 버전 명시
-    configurations {
-        create("main") {
-            jooqConfiguration.apply {
-                jdbc.apply {
-                    driver = "org.h2.Driver"
-                    url = "jdbc:h2:mem:auction_db;DB_CLOSE_DELAY=-1"
-                    user = "sa"
-                    password = ""
-                }
-                generator.apply {
-                    name = "org.jooq.codegen.KotlinGenerator"
-                    database.apply {
-                        name = "org.jooq.meta.h2.H2Database"
-                        inputSchema = "PUBLIC"
-                    }
-                    generate.apply {
-                        isDeprecated = false
-                        isRecords = true
-                        isPojos = true
-                        isPojosEqualsAndHashCode = true
-                    }
-                    target.apply {
-                        packageName = "com.auctionapp.jooq"
-                        directory = "src/main/generated"
-                    }
-                    strategy.name = "org.jooq.codegen.DefaultGeneratorStrategy"
-                }
-            }
-        }
-    }
 }
 
 jacoco {
@@ -172,18 +129,6 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
-}
-
-// 데이터베이스 스키마가 생성된 후에 JOOQ 코드 생성이 실행되도록 설정
-tasks.named("generateJooq") {
-    // JPA가 먼저 스키마를 생성한 후에 JOOQ 코드 생성이 실행되어야 하지만,
-    // 개발 초기에는 generateJooq를 직접 실행하지 않고 필요할 때 수동으로 실행하는 것이 좋습니다.
-}
-
-// 개발 초기에는 JOOQ 코드 생성에 의존하지 않도록 설정
-tasks.named("compileKotlin") {
-    // 데이터베이스가 존재하지 않으면 generateJooq가 실패하므로 dependsOn 제거
-    // dependsOn("generateJooq")
 }
 
 sourceSets {
