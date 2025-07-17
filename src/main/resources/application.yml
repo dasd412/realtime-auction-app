@@ -27,6 +27,15 @@ spring:
     redis:
       host: ${SPRING_DATA_REDIS_HOST:localhost}
       port: ${SPRING_DATA_REDIS_PORT:6379}
+  quartz:
+      job-store-type: jdbc   # JDBC 저장소 사용 (작업 영속화)
+      jdbc:
+          initialize-schema: always   # 처음 실행 시 스키마 자동 생성
+      properties:
+          org.quartz.scheduler.instanceName: AuctionScheduler
+          org.quartz.scheduler.instanceId: AUTO
+          org.quartz.jobStore.useProperties: true
+          org.quartz.jobStore.isClustered: true   # 클러스터 환경 지원
 
 server:
   port: 8080
