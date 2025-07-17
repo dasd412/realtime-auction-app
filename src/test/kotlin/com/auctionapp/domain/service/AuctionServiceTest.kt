@@ -10,7 +10,6 @@ import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
-import java.time.LocalDateTime
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -73,27 +72,6 @@ class AuctionServiceTest(
     }
 
     @Test
-    @DisplayName("경매 시작 시간이 되지 않으면 경매가 시작되지 않는다")
-    fun startAuctionAtNotStartTimeTest() {
-        // given
-        val user = User.fixture()
-        val product = Product.fixture(status = ProductStatus.AVAILABLE, user = user)
-        val auction =
-            Auction.fixture(
-                product = product,
-                user = user,
-                id = 1L,
-                startTime = LocalDateTime.now().minusHours(1),
-            )
-
-        // when
-        auctionService.startAuction(auction, LocalDateTime.now().minusHours(2))
-
-        // then
-        assertThat(auction.status).isEqualTo(AuctionStatus.NOT_STARTED)
-    }
-
-    @Test
     @DisplayName("경매 상태 변경이 올바르지 않으면 경매 시작이 실패한다")
     fun startAuctionWithInvalidStatusTest() {
         // given
@@ -103,12 +81,12 @@ class AuctionServiceTest(
 
         // when & then
         assertThrows<InvalidAuctionStatusChangeException> {
-            auctionService.startAuction(auction, LocalDateTime.now())
+            auctionService.startAuction(auction)
         }
     }
 
     @Test
-    @DisplayName("경매 시작 시간이 되면 경매가 시작된다")
+    @DisplayName("경매가 시작된다")
     fun startAuctionAtStartTimeTest() {
         // given
         val user = User.fixture()
@@ -116,23 +94,7 @@ class AuctionServiceTest(
         val auction = Auction.fixture(product = product, user = user, id = 1L)
 
         // when
-        auctionService.startAuction(auction, LocalDateTime.now())
-
-        // then
-        assertThat(auction.status).isEqualTo(AuctionStatus.ACTIVE)
-    }
-
-    @Test
-    @DisplayName("경매 종료 시간이 되지 않으면 경매가 종료되지 않는다")
-    fun endAuctionAtNotEndTimeTest() {
-        // given
-        val user = User.fixture()
-        val product = Product.fixture(status = ProductStatus.AVAILABLE, user = user)
-        val auction =
-            Auction.fixture(product = product, user = user, id = 1L, status = AuctionStatus.ACTIVE)
-
-        // when
-        auctionService.endAuction(auction, LocalDateTime.now().minusHours(1))
+        auctionService.startAuction(auction)
 
         // then
         assertThat(auction.status).isEqualTo(AuctionStatus.ACTIVE)
@@ -149,12 +111,12 @@ class AuctionServiceTest(
 
         // when & then
         assertThrows<InvalidAuctionStatusChangeException> {
-            auctionService.endAuction(auction, LocalDateTime.now())
+            auctionService.endAuction(auction)
         }
     }
 
     @Test
-    @DisplayName("경매 종료 시간이 되면 경매가 종료된다")
+    @DisplayName("경매가 종료된다")
     fun endAuctionAtEndTimeTest() {
         // given
         val user = User.fixture()
@@ -163,7 +125,7 @@ class AuctionServiceTest(
             Auction.fixture(product = product, user = user, id = 1L, status = AuctionStatus.ACTIVE)
 
         // when
-        auctionService.endAuction(auction, LocalDateTime.now())
+        auctionService.endAuction(auction)
 
         // then
         assertThat(auction.status).isEqualTo(AuctionStatus.ENDED)
@@ -183,7 +145,7 @@ class AuctionServiceTest(
         auctionService.placeBid(Money(2000L), user3, auction)
 
         // when
-        auctionService.endAuction(auction, LocalDateTime.now())
+        auctionService.endAuction(auction)
 
         // then
         assertThat(product.isSold()).isTrue()
@@ -200,7 +162,7 @@ class AuctionServiceTest(
             Auction.fixture(product = product, user = user, id = 1L, status = AuctionStatus.ACTIVE)
 
         // when
-        auctionService.endAuction(auction, LocalDateTime.now())
+        auctionService.endAuction(auction)
 
         // then
         assertThat(product.isAvailable()).isTrue()

@@ -13,6 +13,7 @@ import com.auctionapp.domain.vo.Email
 import com.auctionapp.domain.vo.Money
 import com.auctionapp.expriment.concurrency.strategy.ConcurrencyControlStrategy
 import com.auctionapp.infrastructure.persistence.*
+import com.auctionapp.infrastructure.scheduler.AuctionSchedulerService
 import io.mockk.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -37,6 +38,7 @@ class AuctionAppServiceTest {
     private val redissonClient = mockk<RedissonClient>()
     private val transactionManger = mockk<PlatformTransactionManager>()
     private val securityUtilMockObject = mockkObject(SecurityUtil) // 지우면 모킹 실패하니 지우지 마세요.
+    private val auctionSchedulerService = mockk<AuctionSchedulerService>()
 
     private val auctionAppService =
         AuctionAppService(
@@ -48,6 +50,7 @@ class AuctionAppServiceTest {
             strategyRegistry,
             redissonClient,
             transactionManger,
+            auctionSchedulerService,
         )
 
     @AfterEach
@@ -223,6 +226,7 @@ class AuctionAppServiceTest {
         every { auctionRepository.save(any()) } returns auction
         every { auction.id } returns auctionId
         every { auctionService.registerAuction(any(), any(), any()) } returns Unit
+        every { auctionSchedulerService.scheduleAuctionJobs(auction) } returns Unit
 
         // when
         auctionAppService.registerAuction(productId, initialPrice, minimumBidUnit, startTime, endTime)
@@ -410,6 +414,7 @@ class AuctionAppServiceTest {
         every { userRepository.findByEmail(Email(email)) } returns user
         every { auctionRepository.findByIdOrNull(auctionId) } returns auction
         every { auctionService.cancelAuction(auction, user) } returns Unit
+        every { auctionSchedulerService.unScheduleAuctionJobs(auctionId) } returns Unit
 
         // when
         auctionAppService.cancelAuction(auctionId)
