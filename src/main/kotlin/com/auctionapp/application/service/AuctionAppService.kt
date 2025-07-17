@@ -15,6 +15,7 @@ import com.auctionapp.domain.service.AuctionService
 import com.auctionapp.domain.vo.Email
 import com.auctionapp.domain.vo.Money
 import com.auctionapp.infrastructure.persistence.*
+import com.auctionapp.infrastructure.scheduler.AuctionSchedulerService
 import org.redisson.api.RedissonClient
 import org.redisson.client.RedisException
 import org.springframework.data.domain.Page
@@ -49,6 +50,7 @@ class AuctionAppService(
     private val strategyRegistry: ConcurrencyControlStrategyRegistry,
     private val redissonClient: RedissonClient,
     private val transactionManager: PlatformTransactionManager,
+    private val auctionSchedulerService: AuctionSchedulerService,
 ) {
     @PreAuthorize("hasRole('CUSTOMER')")
     @Transactional
@@ -76,7 +78,10 @@ class AuctionAppService(
             )
 
         auctionService.registerAuction(auction, user, product)
+
         val saved = auctionRepository.save(auction)
+
+        auctionSchedulerService.scheduleAuctionJobs(saved)
 
         return saved.id!!
     }
@@ -119,7 +124,10 @@ class AuctionAppService(
         val username = SecurityUtil.getCurrentUsername() ?: throw UnauthorizedException()
         val user = userRepository.findByEmail(Email(username)) ?: throw NotFoundUserException()
         val auction = auctionRepository.findByIdOrNull(auctionId) ?: throw NotFoundAuctionException()
+
         auctionService.cancelAuction(auction, user)
+
+        auctionSchedulerService.unScheduleAuctionJobs(auctionId)
     }
 
     @PreAuthorize("hasRole('CUSTOMER')")
