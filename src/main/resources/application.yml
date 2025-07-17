@@ -34,7 +34,6 @@ spring:
       properties:
           org.quartz.scheduler.instanceName: AuctionScheduler
           org.quartz.scheduler.instanceId: AUTO
-          org.quartz.jobStore.useProperties: true
           org.quartz.jobStore.isClustered: true   # 클러스터 환경 지원
 
 server:
