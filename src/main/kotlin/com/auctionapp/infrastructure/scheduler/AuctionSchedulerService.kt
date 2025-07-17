@@ -1,6 +1,7 @@
 package com.auctionapp.infrastructure.scheduler
 
 import com.auctionapp.domain.entity.Auction
+import com.auctionapp.infrastructure.scheduler.job.AuctionEndJob
 import com.auctionapp.infrastructure.scheduler.job.AuctionStartJob
 import org.quartz.JobBuilder
 import org.quartz.JobKey
@@ -43,7 +44,7 @@ class AuctionSchedulerService(
 
     private fun scheduleAuctionEndJob(auction: Auction) {
         val jobDetail =
-            JobBuilder.newJob(AuctionStartJob::class.java)
+            JobBuilder.newJob(AuctionEndJob::class.java)
                 .withIdentity("end-auction-${auction.id}", "auction-jobs")
                 .usingJobData("auctionId", auction.id!!)
                 .storeDurably()
