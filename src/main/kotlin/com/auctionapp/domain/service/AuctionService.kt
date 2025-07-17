@@ -9,7 +9,6 @@ import com.auctionapp.domain.exception.UnAuthorizedCancelAuctionException
 import com.auctionapp.domain.exception.UnAuthorizedProductException
 import com.auctionapp.domain.vo.Money
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 
 @Service
 class AuctionService {
@@ -28,22 +27,12 @@ class AuctionService {
         user.registerAuction(auction)
     }
 
-    fun startAuction(
-        auction: Auction,
-        currentTime: LocalDateTime,
-    ) {
-        if (auction.isStartTimeReached(currentTime)) {
-            auction.start()
-        }
+    fun startAuction(auction: Auction) {
+        auction.start()
     }
 
-    fun endAuction(
-        auction: Auction,
-        currentTime: LocalDateTime,
-    ) {
-        if (auction.isEndTimeReached(currentTime)) {
-            auction.end()
-        }
+    fun endAuction(auction: Auction) {
+        auction.end()
     }
 
     fun cancelAuction(

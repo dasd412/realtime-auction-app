@@ -152,14 +152,6 @@ class Auction(
         return bids.size
     }
 
-    fun isStartTimeReached(currentTime: LocalDateTime): Boolean {
-        return currentTime.isAfter(startTime) || currentTime.isEqual(startTime)
-    }
-
-    fun isEndTimeReached(currentTime: LocalDateTime): Boolean {
-        return currentTime.isAfter(endTime) || currentTime.isEqual(endTime)
-    }
-
     companion object {
         fun fixture(
             initialPrice: Money = Money(1000L),
