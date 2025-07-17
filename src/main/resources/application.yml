@@ -50,7 +50,7 @@ logging:
     root: INFO
     com.auctionapp: DEBUG
     org.springframework.web: INFO
-    org.jooq: DEBUG
+    org.quartz: DEBUG
 
 auction:
   websocket:

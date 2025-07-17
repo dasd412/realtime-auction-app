@@ -5,7 +5,6 @@ import com.auctionapp.domain.service.AuctionService
 import com.auctionapp.infrastructure.persistence.AuctionRepository
 import org.quartz.JobExecutionContext
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.scheduling.quartz.QuartzJobBean
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
@@ -23,7 +22,7 @@ class AuctionEndJob : QuartzJobBean() {
         val jobDataMap = context.mergedJobDataMap
         val auctionId = jobDataMap.getLong("auctionId")
 
-        val auction = auctionRepository.findByIdOrNull(auctionId) ?: throw NotFoundAuctionException()
+        val auction = auctionRepository.findByIdWithUserAndProduct(auctionId) ?: throw NotFoundAuctionException()
         auctionService.endAuction(auction)
     }
 }

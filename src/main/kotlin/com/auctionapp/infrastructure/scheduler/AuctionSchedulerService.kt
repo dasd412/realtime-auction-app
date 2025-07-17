@@ -46,7 +46,7 @@ class AuctionSchedulerService(
         val jobDetail =
             JobBuilder.newJob(AuctionEndJob::class.java)
                 .withIdentity("end-auction-${auction.id}", "auction-jobs")
-                .usingJobData("auctionId", auction.id!!)
+                .usingJobData("auctionId", auction.id!!.toString())
                 .storeDurably()
                 .build()
 

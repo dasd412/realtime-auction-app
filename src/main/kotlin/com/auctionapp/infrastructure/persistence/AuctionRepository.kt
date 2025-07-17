@@ -12,7 +12,6 @@ import org.springframework.data.jpa.repository.Lock
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
-import java.time.LocalDateTime
 
 interface AuctionDetail {
     fun getAuction(): Auction
@@ -51,18 +50,6 @@ interface AuctionRepository : JpaRepository<Auction, Long> {
         pageable: Pageable,
     ): Page<Auction>
 
-    // todo 스케쥴러 구현 떄 사용할 예정
-    @Query("SELECT a FROM Auction a WHERE a.status = 'NOT_STARTED' AND a.startTime <= :currentTime")
-    fun findAuctionsToStart(
-        @Param("currentTime") currentTime: LocalDateTime,
-    ): List<Auction> // 자동 시작 대상 경매 조회
-
-    // todo 스케쥴러 구현 떄 사용할 예정
-    @Query("SELECT a FROM Auction a WHERE a.status = 'ACTIVE' AND a.endTime >= :currentTime")
-    fun findAuctionsToEnd(
-        @Param("currentTime") currentTime: LocalDateTime,
-    ): List<Auction> // 자동 종료 대상 경매 조회
-
     // 사용자가 생성한 경매 목록  (paging이므로 fetch 안함.)
     fun findByUser(
         user: User,
@@ -79,6 +66,11 @@ interface AuctionRepository : JpaRepository<Auction, Long> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT a FROM Auction a WHERE a.id = :id")
     fun findByIdWithPessimisticLock(
+        @Param("id")id: Long,
+    ): Auction?
+
+    @Query("SELECT a FROM Auction a JOIN FETCH a.user u JOIN FETCH a.product p WHERE a.id = :id")
+    fun findByIdWithUserAndProduct(
         @Param("id")id: Long,
     ): Auction?
 }
