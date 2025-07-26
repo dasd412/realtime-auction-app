@@ -31,7 +31,7 @@ class SecurityConfig(
                     .requestMatchers("/ws/**").permitAll() // 웹소켓 접근 허용
                     .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**").permitAll()
                     .requestMatchers("/h2-console/**").permitAll()
-                    .requestMatchers("/auth/login", "/auth/signup").permitAll()
+                    .requestMatchers("api/auth/login", "api/auth/signup").permitAll()
                     .requestMatchers("/admin/**").hasRole("ADMIN")
                     .anyRequest().authenticated()
             }
