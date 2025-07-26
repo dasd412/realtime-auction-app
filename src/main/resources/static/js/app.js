@@ -2,13 +2,13 @@
 document.addEventListener('DOMContentLoaded', function() {
     // 초기 화면 설정
     checkAuthStatus();
-
+    
     // 이벤트 리스너 설정
     setupEventListeners();
 });
 
 function checkAuthStatus() {
-    const token = localStorage.getItem('auth_token');
+    const token = window.authAPI.getAuthToken();
     if (token) {
         // 이미 로그인된 상태면 경매 목록 화면으로
         showScreen('list');
@@ -25,28 +25,38 @@ function setupEventListeners() {
         e.preventDefault();
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
-
+        
         if (!email || !password) {
             alert('이메일과 비밀번호를 모두 입력해주세요.');
             return;
         }
-
+        
         try {
-            await login(email, password);
+            await window.authAPI.login(email, password);
             showScreen('list');
             loadAuctions();
         } catch (error) {
-            console.error('로그인 실패:', error);  // 디버깅용 로그
+            console.error('로그인 실패:', error);
             alert('로그인에 실패했습니다: ' + error.message);
         }
     });
-
+    
     // 회원가입 폼 제출 이벤트
     document.querySelector('#register form').addEventListener('submit', async function(e) {
         e.preventDefault();
-        // 회원가입 로직 구현...
+        const email = document.getElementById('reg-email').value;
+        const password = document.getElementById('reg-password').value;
+        const name = document.getElementById('reg-name').value;
+        
+        try {
+            await window.authAPI.signup(email, password, name);
+            alert('회원가입이 완료되었습니다!');
+            showScreen('login');
+        } catch (error) {
+            alert('회원가입에 실패했습니다: ' + error.message);
+        }
     });
-
+    
     // 경매 등록 폼 제출 이벤트
     document.querySelector('#create form').addEventListener('submit', async function(e) {
         e.preventDefault();
@@ -58,9 +68,9 @@ function setupEventListeners() {
             startTime: document.getElementById('startTime').value,
             endTime: document.getElementById('endTime').value
         };
-
+        
         try {
-            await createAuction(auctionData);
+            await window.auctionAPI.createAuction(auctionData);
             alert('경매가 성공적으로 등록되었습니다!');
             showScreen('list');
             loadAuctions();
@@ -68,14 +78,14 @@ function setupEventListeners() {
             alert('경매 등록에 실패했습니다: ' + error.message);
         }
     });
-
+    
     // 입찰 폼 제출 이벤트 (경매 상세 화면)
     document.querySelector('.bid-form button').addEventListener('click', async function() {
         const auctionId = getCurrentAuctionId();
         const bidAmount = parseInt(document.getElementById('bidAmount').value);
-
+        
         try {
-            await placeBid(auctionId, bidAmount);
+            await window.auctionAPI.placeBid(auctionId, bidAmount);
             // 웹소켓으로 실시간 업데이트가 올 것이므로 여기서는 UI 업데이트 불필요
         } catch (error) {
             alert('입찰에 실패했습니다: ' + error.message);
@@ -86,7 +96,7 @@ function setupEventListeners() {
 // 경매 목록 로드 및 화면에 표시
 async function loadAuctions() {
     try {
-        const auctions = await getAuctions();
+        const auctions = await window.auctionAPI.getAuctions();
         displayAuctions(auctions);
     } catch (error) {
         console.error('경매 목록 로드 실패:', error);
@@ -120,20 +130,20 @@ function displayAuctions(auctions) {
 // 경매 상세 화면 표시
 async function showAuctionDetail(auctionId) {
     try {
-        const auction = await getAuctionDetail(auctionId);
-
+        const auction = await window.auctionAPI.getAuctionDetail(auctionId);
+        
         // 경매 상세 정보 화면 설정
         document.querySelector('.screen-title').textContent = auction.title;
         document.getElementById('currentPrice').textContent = `₩${auction.currentPrice.toLocaleString()}`;
-
+        
         // 입찰 폼 설정
         const minBidAmount = auction.currentPrice + auction.bidUnit;
         document.getElementById('bidAmount').setAttribute('min', minBidAmount);
         document.getElementById('bidAmount').setAttribute('placeholder', minBidAmount.toString());
-
+        
         // 웹소켓 연결
         connectWebSocket(auctionId);
-
+        
         // 화면 전환
         showScreen('detail');
     } catch (error) {
