@@ -22,24 +22,27 @@ spring:
     jdbc:
       initialize-schema: always
   mvc:
-    static-path-pattern: /**
+    static-path-pattern: /** # 정적 리소스 경로 패턴
+  web:
+    resources:
+      static-locations: classpath:/static/ # 정적 리소스 위치 명시적 설정
   data:
     redis:
       host: ${SPRING_DATA_REDIS_HOST:localhost}
       port: ${SPRING_DATA_REDIS_PORT:6379}
   quartz:
-      job-store-type: jdbc   # JDBC 저장소 사용 (작업 영속화)
+      job-store-type: jdbc
       jdbc:
-          initialize-schema: always   # 처음 실행 시 스키마 자동 생성
+          initialize-schema: always
       properties:
           org.quartz.scheduler.instanceName: AuctionScheduler
           org.quartz.scheduler.instanceId: AUTO
-          org.quartz.jobStore.isClustered: true   # 클러스터 환경 지원
+          org.quartz.jobStore.isClustered: true
 
 server:
   port: 8080
-  servlet:
-      context-path: /api
+  # context-path 제거 - API와 정적 리소스 분리를 위해 제거
+
 jwt:
   secret: eW91ci1zZWNyZXQta2V5LWhlcmUtc2hvdWxkLWJlLWF0LWxlYXN0LTMyLWNoYXJhY3RlcnM=
   expiration: 86400000 # 24 hours in milliseconds

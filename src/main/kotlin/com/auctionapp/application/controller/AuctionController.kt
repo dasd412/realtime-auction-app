@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/auctions")
+@RequestMapping("/api/auctions")
 @SuppressWarnings("unused")
 class AuctionController(
     private val auctionAppService: AuctionAppService,

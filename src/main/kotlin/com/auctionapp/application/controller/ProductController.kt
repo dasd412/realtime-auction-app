@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/products")
+@RequestMapping("/api/products")
 @SuppressWarnings("unused")
 class ProductController(
     private val productAppService: ProductAppService,

@@ -27,7 +27,8 @@ class SecurityConfig(
             .csrf { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests {
-                it.requestMatchers("/", "/index.html", "/static/**").permitAll()
+                it.requestMatchers("/", "/index.html", "/css/**", "/js/**", "/images/**").permitAll() // CSS, JS 파일 접근 허용
+                    .requestMatchers("/ws/**").permitAll() // 웹소켓 접근 허용
                     .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**").permitAll()
                     .requestMatchers("/h2-console/**").permitAll()
                     .requestMatchers("/auth/login", "/auth/signup").permitAll()
