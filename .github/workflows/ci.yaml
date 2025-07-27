@@ -128,7 +128,6 @@ jobs:
           SPRING_DATA_REDIS_PORT: 6379
           REDISSON_ADDRESS: redis://localhost:6379
           SERVER_PORT: 8080
-          SERVER_SERVLET_CONTEXT_PATH: /api
 
       - name: Check Postman Files
         run: |
@@ -143,8 +142,6 @@ jobs:
           --environment ./postman/auction-environment.postman_environment.json \
           --reporters cli,htmlextra \
           --reporter-htmlextra-export build/reports/newman/report.html
-        env:
-          BASE_URL: http://localhost:8080/api
 
       - name: Save Newman Report
         if: always()
