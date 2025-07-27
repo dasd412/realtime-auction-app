@@ -108,7 +108,7 @@ jobs:
           nohup java -jar $EXEC_JAR --server.port=8080 > app.log 2>&1 &
           APP_PID=$!
           echo "Waiting for application to start..."
-          sleep 30
+          sleep 60
 
           # 서버 상태 확인
           if ps -p $APP_PID > /dev/null; then
