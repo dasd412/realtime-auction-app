@@ -56,7 +56,7 @@ class AuthControllerTest {
 
         // when & then
         mockMvc.perform(
-            post("/auth/signup")
+            post("/api/auth/signup")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)),
         )
@@ -81,7 +81,7 @@ class AuthControllerTest {
 
         // when & then
         mockMvc.perform(
-            post("/auth/signup")
+            post("/api/auth/signup")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)),
         )
@@ -105,7 +105,7 @@ class AuthControllerTest {
 
         // when & then
         mockMvc.perform(
-            post("/auth/signup")
+            post("/api/auth/signup")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)),
         )
@@ -134,7 +134,7 @@ class AuthControllerTest {
 
         // when & then
         mockMvc.perform(
-            post("/auth/login")
+            post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)),
         )
@@ -158,7 +158,7 @@ class AuthControllerTest {
 
         // when & then
         mockMvc.perform(
-            post("/auth/login")
+            post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)),
         )
@@ -183,7 +183,7 @@ class AuthControllerTest {
 
         // when & then
         mockMvc.perform(
-            post("/auth/refresh")
+            post("/api/auth/refresh")
                 .header("Authorization", "Bearer $refreshToken"),
         )
             .andDo(print())
@@ -201,7 +201,7 @@ class AuthControllerTest {
 
         // when & then
         mockMvc.perform(
-            post("/auth/refresh")
+            post("/api/auth/refresh")
                 .header("Authorization", "Bearer $invalidToken"),
         )
             .andDo(print())
@@ -219,7 +219,7 @@ class AuthControllerTest {
 
         // when & then
         mockMvc.perform(
-            post("/auth/logout")
+            post("/api/auth/logout")
                 .header("Authorization", "Bearer $accessToken"),
         )
             .andDo(print())
@@ -237,7 +237,7 @@ class AuthControllerTest {
 
         // when & then
         mockMvc.perform(
-            post("/auth/logout")
+            post("/api/auth/logout")
                 .header("Authorization", "Bearer $invalidToken"),
         )
             .andDo(print())

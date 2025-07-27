@@ -486,6 +486,7 @@ class AuctionAppServiceTest {
         every { auctionRepository.findByIdOrNull(auctionId) } returns auction
         every { bidRepository.save(any()) } returns bid
         every { strategyRegistry.getCurrentStrategy() } returns strategy
+        every { auctionRepository.save(any()) } returns auction
         every { strategy.placeBid(auction, user, Money(amount)) } returns bid
 
         // when
