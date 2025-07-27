@@ -130,10 +130,17 @@ jobs:
           SERVER_PORT: 8080
           SERVER_SERVLET_CONTEXT_PATH: /api
 
+      - name: Check Postman Files
+        run: |
+          echo "Listing postman directory:"
+          ls -la ./postman/
+          echo "Content of environment file:"
+          cat ./postman/auction-environment.postman_environment.json
+
       - name: Run API Tests with Newman
         run: |
           newman run ./postman/auction.postman_collection.json \
-          --environment ./postman/-auctionEnvironment.postman_environment.json \
+          --environment ./postman/auction-environment.postman_environment.json \
           --reporters cli,htmlextra \
           --reporter-htmlextra-export build/reports/newman/report.html
         env:
