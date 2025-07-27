@@ -73,7 +73,7 @@ jobs:
           path: 'build/test-results/test/*.xml'
           reporter: java-junit
           fail-on-error: false
-          
+
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
@@ -104,12 +104,12 @@ jobs:
           # plain이 아닌 실행 가능한 JAR 파일 찾기
           EXEC_JAR=$(find build/libs/ -name "*.jar" -not -name "*plain.jar" | head -n 1)
           echo "Found executable JAR: $EXEC_JAR"
-          
+
           nohup java -jar $EXEC_JAR --server.port=8080 > app.log 2>&1 &
           APP_PID=$!
           echo "Waiting for application to start..."
-          sleep 60
-          
+          sleep 30
+
           # 서버 상태 확인
           if ps -p $APP_PID > /dev/null; then
             echo "Application started with PID $APP_PID"
@@ -128,7 +128,7 @@ jobs:
           SPRING_DATA_REDIS_PORT: 6379
           REDISSON_ADDRESS: redis://localhost:6379
           SERVER_PORT: 8080
-          SERVER_SERVLET_CONTEXT_PATH: /api  
+          SERVER_SERVLET_CONTEXT_PATH: /api
 
       - name: Run API Tests with Newman
         run: |

@@ -148,6 +148,9 @@ class AuctionAppService(
 
         auction.addBidEvent(savedBid)
 
+        // 이벤트 발행을 위해 auction 객체 저장
+        auctionRepository.save(auction)
+
         return savedBid.id!!
     }
 
@@ -193,6 +196,9 @@ class AuctionAppService(
 
                 val savedBid = placeBidInTransaction(money, user, auction)
                 auction.addBidEvent(savedBid)
+
+                // 이벤트 발행을 위해 auction 객체 저장
+                auctionRepository.save(auction)
 
                 savedBid.id!!
             }!!

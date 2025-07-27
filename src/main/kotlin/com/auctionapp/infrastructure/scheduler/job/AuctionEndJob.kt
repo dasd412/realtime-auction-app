@@ -24,5 +24,7 @@ class AuctionEndJob : QuartzJobBean() {
 
         val auction = auctionRepository.findByIdWithUserAndProduct(auctionId) ?: throw NotFoundAuctionException()
         auctionService.endAuction(auction)
+        // 이벤트 발행을 위해 auction 객체 저장
+        auctionRepository.save(auction)
     }
 }

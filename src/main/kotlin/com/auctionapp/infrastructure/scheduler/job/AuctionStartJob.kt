@@ -25,5 +25,7 @@ class AuctionStartJob : QuartzJobBean() {
 
         val auction = auctionRepository.findByIdOrNull(auctionId) ?: throw NotFoundAuctionException()
         auctionService.startAuction(auction)
+        // 이벤트 발행을 위해 auction 객체 저장
+        auctionRepository.save(auction)
     }
 }
