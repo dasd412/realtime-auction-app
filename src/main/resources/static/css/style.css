@@ -332,3 +332,33 @@ body {
         flex-direction: column;
     }
 }
+
+/* 웹소켓 테스트 관련 스타일 */
+.log-time {
+    color: #888;
+    font-weight: bold;
+}
+
+#ws-log {
+    color: #333;
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+}
+
+#websocket-test .form-control {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: monospace;
+}
+
+#websocket-test textarea {
+    resize: vertical;
+}
+
+.status-ended {
+    background: #f8d7da;
+    color: #721c24;
+}
